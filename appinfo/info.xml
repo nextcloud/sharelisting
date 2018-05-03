@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<info xmlns:xsi= "http://www.w3.org/2001/XMLSchema-instance"
+	  xsi:noNamespaceSchemaLocation="https://apps.nextcloud.com/schema/apps/info.xsd">
+	<id>sharelisting</id>
+	<name>Share Listing</name>
+	<summary>List shares on the command line</summary>
+	<description>
+		The application generates a list of shares for display at the command line
+	</description>
+	<version>0.0.1</version>
+	<licence>agpl</licence>
+	<author>Roeland Jago Douma</author>
+	<namespace>ShareListing</namespace>
+	<dependencies>
+		<nextcloud min-version="13" max-version="14" />
+	</dependencies>
+
+	<commands>
+		<command>OCA\ShareListing\Command\ListShares</command>
+	</commands>
+</info>
