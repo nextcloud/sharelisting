@@ -102,7 +102,7 @@ class ListShares extends Command {
 		];
 	}
 
-	private function do(string $userId, int $filter, string $path = null) {
+	private function do(string $userId, int $filter, string $path = null): \Iterator {
 		$shares = $this->getShares($userId);
 
 		// If path is set. Filter for the current user
@@ -150,7 +150,7 @@ class ListShares extends Command {
 	}
 
 
-	private function getShares(string $userId): iterable {
+	private function getShares(string $userId): \Iterator {
 		$shareTypes = $this->getShareTypes();
 
 		foreach ($shareTypes as $shareType) {
