@@ -7,7 +7,7 @@
 	<description>
 		The application generates a list of shares for display at the command line
 	</description>
-	<version>0.0.2</version>
+	<version>0.0.3</version>
 	<licence>agpl</licence>
 	<author>Roeland Jago Douma</author>
 	<namespace>ShareListing</namespace>

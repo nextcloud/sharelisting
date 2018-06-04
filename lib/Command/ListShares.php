@@ -142,6 +142,13 @@ class ListShares extends Command {
 			}, $shares);
 		}
 
+		$shares = iter\filter(function (IShare $share) {
+			$userFolder = $this->rootFolder->getUserFolder($share->getShareOwner());
+			$nodes = $userFolder->getById($share->getNodeId());
+
+			return $nodes !== [];
+		}, $shares);
+
 		$formattedShares = iter\map(function (IShare $share) {
 			return $this->formatShare($share);
 		}, $shares);
