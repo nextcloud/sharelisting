@@ -7,12 +7,12 @@
 	<description>
 		The application generates a list of shares for display at the command line
 	</description>
-	<version>0.0.3</version>
+	<version>0.0.4</version>
 	<licence>agpl</licence>
 	<author>Roeland Jago Douma</author>
 	<namespace>ShareListing</namespace>
 	<dependencies>
-		<nextcloud min-version="13" max-version="14" />
+		<nextcloud min-version="13" max-version="15" />
 	</dependencies>
 
 	<commands>
