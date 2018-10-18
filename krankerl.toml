@@ -1,0 +1,10 @@
+[package]
+exclude = [
+    ".git",
+    ".gitignore",
+    "Makefile"
+]
+
+before_cmds = [
+    "composer install --no-dev"
+]
