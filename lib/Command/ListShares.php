@@ -3,6 +3,7 @@
 namespace OCA\ShareListing\Command;
 
 use iter;
+use OC\User\NoUserException;
 use OCP\Files\Folder;
 use OCP\Files\IRootFolder;
 use OCP\Files\NotFoundException;
@@ -143,7 +144,11 @@ class ListShares extends Command {
 		}
 
 		$shares = iter\filter(function (IShare $share) {
-			$userFolder = $this->rootFolder->getUserFolder($share->getShareOwner());
+			try {
+				$userFolder = $this->rootFolder->getUserFolder($share->getShareOwner());
+			} catch (NoUserException $e) {
+				return false;
+			}
 			$nodes = $userFolder->getById($share->getNodeId());
 
 			return $nodes !== [];
