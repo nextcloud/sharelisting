@@ -4,13 +4,13 @@
 	<id>sharelisting</id>
 	<name>Share Listing</name>
 	<summary>List shares on the command line</summary>
-	<description>
-		The application generates a list of shares for display at the command line
-	</description>
-	<version>0.1.0</version>
+	<description>The application generates a list of shares for display at the command line</description>
+	<version>0.1.1</version>
 	<licence>agpl</licence>
 	<author>Roeland Jago Douma</author>
 	<namespace>ShareListing</namespace>
+	<category>tools</category>
+	<bugs>https://github.com/rullzer/sharelisting/issues</bugs>
 	<dependencies>
 		<nextcloud min-version="13" max-version="15" />
 	</dependencies>
