@@ -35,6 +35,6 @@ class Application extends App {
 
 	public function __construct() {
 		parent::__construct(self::appID);
-		require_once __DIR__ . '/../../3rdparty/autoload.php';
+		require_once __DIR__ . '/../../vendor/autoload.php';
 	}
 }
