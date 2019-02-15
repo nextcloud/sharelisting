@@ -148,6 +148,8 @@ class ListShares extends Command {
 				$userFolder = $this->rootFolder->getUserFolder($share->getShareOwner());
 			} catch (NoUserException $e) {
 				return false;
+			} catch (\Throwable $e) {
+				return false;
 			}
 			$nodes = $userFolder->getById($share->getNodeId());
 
