@@ -4,6 +4,7 @@ declare(strict_types=1);
  * @copyright Copyright (c) 2018 Roeland Jago Douma <roeland@famdouma.nl>
  *
  * @author Roeland Jago Douma <roeland@famdouma.nl>
+ * @author John Molakvoæ <skjnldsv@protonmail.com>
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -121,13 +122,18 @@ class SharesList {
 			return $nodes !== [];
 		}, $shares);
 
+		return $shares;
+	}
+
+	public function getFormattedShares(string $userId, int $filter, string $path = null): \Iterator {
+		$shares = $this->get($userId, $filter, $path);
+
 		$formattedShares = iter\map(function (IShare $share) {
 			return $this->formatShare($share);
 		}, $shares);
 
 		return $formattedShares;
 	}
-
 
 	private function getShares(string $userId): \Iterator {
 		$shareTypes = $this->getShareTypes();
@@ -148,10 +154,11 @@ class SharesList {
 		}
 	}
 
-	private function formatShare(IShare $share): array {
+	public function formatShare(IShare $share): array {
 		$userFolder = $this->rootFolder->getUserFolder($share->getShareOwner());
 		
 		$data = [
+			'id' => $share->getId(),
 			'owner' => $share->getShareOwner(),
 			'initiator' => $share->getSharedBy(),
 			'time' => $share->getShareTime()->format(\DATE_ATOM),

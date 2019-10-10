@@ -4,6 +4,7 @@ declare(strict_types=1);
  * @copyright Copyright (c) 2018 Roeland Jago Douma <roeland@famdouma.nl>
  *
  * @author Roeland Jago Douma <roeland@famdouma.nl>
+ * @author John Molakvoæ <skjnldsv@protonmail.com>
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -102,13 +103,13 @@ class ListShares extends Command {
 		if ($user === null) {
 			$shares = [];
 			$this->userManager->callForSeenUsers(function (IUser $user) use ($path, $filter, &$shares) {
-				$tmp = $this->sharesList->get($user->getUID(), $filter, $path);
+				$tmp = $this->sharesList->getFormattedShares($user->getUID(), $filter, $path);
 				foreach ($tmp as $share) {
 					$shares[] = $share;
 				}
 			});
 		} else {
-			$shares = iter\toArray($this->sharesList->get($user, $filter, $path));
+			$shares = iter\toArray($this->sharesList->getFormattedShares($user, $filter, $path));
 		}
 
 		$output->writeln(json_encode($shares, JSON_PRETTY_PRINT));

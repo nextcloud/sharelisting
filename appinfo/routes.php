@@ -1,9 +1,8 @@
 <?php
 declare(strict_types=1);
 /**
- * @copyright Copyright (c) 2018 Roeland Jago Douma <roeland@famdouma.nl>
+ * @copyright Copyright (c) 2019 John Molakvoæ <skjnldsv@protonmail.com>
  *
- * @author Roeland Jago Douma <roeland@famdouma.nl>
  * @author John Molakvoæ <skjnldsv@protonmail.com>
  *
  * @license GNU AGPL version 3 or any later version
@@ -23,23 +22,12 @@ declare(strict_types=1);
  *
  */
 
-namespace OCA\ShareListing\AppInfo;
-
-use OCA\Files\Event\LoadSidebar;
-use OCA\ShareListing\Listener\LoadSidebarScript;
-use OCP\AppFramework\App;
-use OCP\EventDispatcher\IEventDispatcher;
-
-class Application extends App {
-
-	const appID = 'sharelisting';
-
-	public function __construct() {
-		parent::__construct(self::appID);
-		
-		// listen to sidebar loading event
-		$server = $this->getContainer()->getServer();
-		$eventDispatcher = $server->query(IEventDispatcher::class);
-		$eventDispatcher->addServiceListener(LoadSidebar::class, LoadSidebarScript::class);
-	}
-}
+return [
+	'ocs' => [
+		[
+			'name' => 'Api#getSharedSubfolders',
+			'url'  => '/api/v1/sharedSubfolders',
+			'verb' => 'GET'
+        ]
+	]
+];
