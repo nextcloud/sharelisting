@@ -24,10 +24,7 @@ declare(strict_types=1);
 
 namespace OCA\ShareListing\AppInfo;
 
-use OCA\SSLTest\Notifications\Notifier;
 use OCP\AppFramework\App;
-use OCP\L10N\IFactory as L10NFactory;
-use OCP\Notification\IManager as NotificationsManager;
 
 class Application extends App {
 
