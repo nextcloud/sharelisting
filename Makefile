@@ -9,6 +9,48 @@ source_dir=$(build_dir)/source
 package_name=$(app_name)
 cert_dir=$(HOME)/.nextcloud/certificates
 
+all: dev-setup lint build-js-production
+
+# Dev env management
+dev-setup: clean clean-dev npm-init
+
+npm-init:
+	npm install
+
+npm-update:
+	npm update
+
+# Building
+build-js:
+	npm run dev
+
+build-js-production:
+	npm run build
+
+watch-js:
+	npm run watch
+
+# Linting
+lint:
+	npm run lint
+
+lint-fix:
+	npm run lint:fix
+
+# Style linting
+stylelint:
+	npm run stylelint
+
+stylelint-fix:
+	npm run stylelint:fix
+
+# Cleaning
+clean:
+	rm -f js
+
+clean-dev:
+	rm -rf node_modules
+
 appstore:
 	mkdir -p $(sign_dir)
 	rsync -a \
