@@ -159,6 +159,7 @@ class SharesList {
 		
 		$data = [
 			'id' => $share->getId(),
+			'file_id' => $share->getNodeId(),
 			'owner' => $share->getShareOwner(),
 			'initiator' => $share->getSharedBy(),
 			'time' => $share->getShareTime()->format(\DATE_ATOM),
@@ -168,6 +169,9 @@ class SharesList {
 		$nodes = $userFolder->getById($share->getNodeId());
 		$node = array_shift($nodes);
 		$data['path'] = $userFolder->getRelativePath($node->getPath());
+		$data['name'] = $node->getName();
+		$data['is_directory'] = $node->getType() === 'dir';
+
 
 		
 		if ($share->getShareType() === Share::SHARE_TYPE_USER) {

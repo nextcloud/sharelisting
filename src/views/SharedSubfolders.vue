@@ -36,13 +36,13 @@
 		<SharedEntrySimple v-for="share in shares"
 			:key="share.id"
 			class="sharing-entry__subfolder"
-			:title="share.path"
+			:title="share.name"
 			:subtitle="t('sharelisting', 'Shared by {initiator}', { initiator: share.initiator })">
 			<template #avatar>
-				<div class="avatar-subfolder icon-folder" />
+				<div :class="[share.is_directory ? 'icon-folder' : 'icon-file']" class="avatar-subfolder" />
 			</template>
-			<ActionLink icon="icon-confirm" :href="generateFileUrl(share.path)">
-				{{ t('sharelisting', 'Go to folder') }}
+			<ActionLink icon="icon-confirm" :href="generateFileUrl(share.path, share.file_id)">
+				{{ share.path }}
 			</ActionLink>
 		</SharedEntrySimple>
 	</div>
@@ -91,7 +91,7 @@ export default {
 			return 'icon-triangle-s'
 		},
 		mainTitle() {
-			return t('sharelisting', 'Shared subfolders {count}', {
+			return t('sharelisting', 'Shared subitems {count}', {
 				count: this.loaded ? `: ${this.shares.length}` : ''
 			})
 		},
@@ -151,10 +151,11 @@ export default {
 		 * Generate a file app url to a provided path
 		 *
 		 * @param {string} dir the absolute url to the folder
+		 * @param {number} fileid the node id
 		 * @returns {string}
 		 */
-		generateFileUrl(dir) {
-			return generateUrl('/apps/files?dir={dir}', { dir })
+		generateFileUrl(dir, fileid) {
+			return generateUrl('/apps/files?dir={dir}&fileid={fileid}', { dir, fileid })
 		}
 	}
 }
