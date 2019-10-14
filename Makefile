@@ -12,7 +12,10 @@ cert_dir=$(HOME)/.nextcloud/certificates
 all: dev-setup lint build-js-production
 
 # Dev env management
-dev-setup: clean clean-dev npm-init
+dev-setup: clean clean-dev npm-init composer-init
+
+composer-init:
+	composer install --no-dev
 
 npm-init:
 	npm install
@@ -46,7 +49,7 @@ stylelint-fix:
 
 # Cleaning
 clean:
-	rm -f js
+	rm -rf js
 
 clean-dev:
 	rm -rf node_modules

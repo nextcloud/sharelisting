@@ -84,21 +84,25 @@ class ApiController extends OCSController {
 
 		$shares = $this->sharesList->get($currentUser->getUID(), SharesList::FILTER_NONE, $path);
 
-		// only get folders
-		$filteredShares = iter\filter(function(IShare $share) {
-			return $share->getNodeType() === 'folder';
-		}, $shares);
-
 		// format results
 		$formattedShares = iter\map(function (IShare $share) {
 			return $this->sharesList->formatShare($share);
-		}, $filteredShares);
+		}, $shares);
 
 		// remove current folder
-		$cleanedShares = iter\filter(function($share) use ($path) {
+		$filteredShares = iter\filter(function($share) use ($path) {
 			return $share['path'] !== $path;
 		}, $formattedShares);
 
-		return new DataResponse(iter\toArray($cleanedShares));
+		// sort directories first
+		$sortedShares = iter\toArray($filteredShares);
+		usort($sortedShares, function($a, $b) {
+			if ($a['is_directory'] && $b['is_directory']) {
+				return strcmp($a['path'], $b['path']);
+			}
+			return $b['is_directory'] - $a['is_directory'];
+		});
+
+		return new DataResponse($sortedShares);
 	}
 }
