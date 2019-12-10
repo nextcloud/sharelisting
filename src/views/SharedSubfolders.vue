@@ -61,14 +61,14 @@ export default {
 	components: {
 		ActionButton,
 		ActionLink,
-		SharedEntrySimple
+		SharedEntrySimple,
 	},
 
 	props: {
 		fileInfo: {
 			type: Object,
-			required: true
-		}
+			required: true,
+		},
 	},
 
 	data() {
@@ -76,7 +76,7 @@ export default {
 			loaded: false,
 			loading: false,
 			showSubfolders: false,
-			shares: []
+			shares: [],
 		}
 	},
 
@@ -92,19 +92,19 @@ export default {
 		},
 		mainTitle() {
 			return t('sharelisting', 'Shared subitems {count}', {
-				count: this.loaded ? `: ${this.shares.length}` : ''
+				count: this.loaded ? `: ${this.shares.length}` : '',
 			})
 		},
 		fullPath() {
 			const path = `${this.fileInfo.path}/${this.fileInfo.name}`
 			return path.replace('//', '/')
-		}
+		},
 	},
 
 	watch: {
 		fileInfo() {
 			this.resetState()
-		}
+		},
 	},
 
 	methods: {
@@ -156,8 +156,8 @@ export default {
 		 */
 		generateFileUrl(dir, fileid) {
 			return generateUrl('/apps/files?dir={dir}&fileid={fileid}', { dir, fileid })
-		}
-	}
+		},
+	},
 }
 </script>
 
