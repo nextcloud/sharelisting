@@ -91,9 +91,7 @@ export default {
 			return 'icon-triangle-s'
 		},
 		mainTitle() {
-			return t('sharelisting', 'Shared subitems {count}', {
-				count: this.loaded ? `: ${this.shares.length}` : '',
-			})
+			return t('sharelisting', 'Shared subitems')
 		},
 		fullPath() {
 			const path = `${this.fileInfo.path}/${this.fileInfo.name}`
