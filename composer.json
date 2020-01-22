@@ -8,5 +8,8 @@
   },
   "require": {
     "nikic/iter": "^2.0"
+  },
+  "scripts": {
+    "lint": "find . -name \\*.php -not -path './vendor/*' -exec php -l \"{}\" \\;"
   }
 }
