@@ -125,7 +125,13 @@ class SharesList {
 		return $shares;
 	}
 
-	public function getSub(string $userId, int $filter, string $path = null): \Iterator {
+	/**
+	 * Get all subshares of the current path
+	 * Get all shares. And filter them by being a subpath of the current path.
+	 * This allows us to build a list of subfiles/folder that are shared
+	 * as well
+	 */
+	public function getSub(string $userId, int $filter, string $path): \Iterator {
 		$shares = $this->shareManager->getAllShares();
 
 		// If path is set. Filter for the current user
