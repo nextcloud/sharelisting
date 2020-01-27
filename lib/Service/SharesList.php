@@ -139,7 +139,7 @@ class SharesList {
 			}
 			$shares = iter\filter(function (IShare $share) use ($node) {
 				if ($node->getId() === $share->getNodeId()) {
-					return true;
+					return false;
 				}
 				if ($node instanceof Folder) {
 					return !empty($node->getById($share->getNodeId()));
