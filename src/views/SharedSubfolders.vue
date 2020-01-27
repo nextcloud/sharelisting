@@ -23,7 +23,7 @@
 <template>
 	<div class="sharing-entry__subfolders">
 		<!-- Main collapsible entry -->
-		<SharedEntrySimple :title="mainTitle">
+		<SharedEntrySimple :title="mainTitle" :subtitle="subTitle">
 			<template #avatar>
 				<div class="avatar-subfolder avatar-subfolder--primary icon-folder-shared-white" />
 			</template>
@@ -92,6 +92,11 @@ export default {
 		},
 		mainTitle() {
 			return t('sharelisting', 'Shared subitems')
+		},
+		subTitle() {
+			return (this.showSubfolders && this.shares.length === 0)
+				? t('sharelisting', 'No shared subfolders found')
+				: ''
 		},
 		fullPath() {
 			const path = `${this.fileInfo.path}/${this.fileInfo.name}`
