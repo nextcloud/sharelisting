@@ -61,16 +61,72 @@ class SharesList {
 
 	private function getShareTypes(): array {
 		return [
-			\OCP\Share::SHARE_TYPE_USER,
-			\OCP\Share::SHARE_TYPE_GROUP,
-			\OCP\Share::SHARE_TYPE_LINK,
-			\OCP\Share::SHARE_TYPE_EMAIL,
-			\OCP\Share::SHARE_TYPE_REMOTE,
+			IShare::TYPE_USER,
+			IShare::TYPE_GROUP,
+			IShare::TYPE_LINK,
+			IShare::TYPE_EMAIL,
+			IShare::TYPE_REMOTE,
 		];
 	}
 
 	public function get(string $userId, int $filter, string $path = null): \Iterator {
 		$shares = $this->getShares($userId);
+
+		// If path is set. Filter for the current user
+		if ($path !== null) {
+			$userFolder = $this->rootFolder->getUserFolder($userId);
+			try {
+				$node = $userFolder->get($path);
+			} catch (NotFoundException $e) {
+				// Path is not valid for user so nothing to report;
+				return new \EmptyIterator();
+			}
+			$shares = iter\filter(function (IShare $share) use ($node) {
+				if ($node->getId() === $share->getNodeId()) {
+					return true;
+				}
+				if ($node instanceof Folder) {
+					return !empty($node->getById($share->getNodeId()));
+				}
+				return false;
+			}, $shares);
+		}
+
+		if ($filter === self::FILTER_OWNER) {
+			$shares = iter\filter(function (IShare $share) use ($userId) {
+				return $share->getShareOwner() === $userId;
+			}, $shares);
+		}
+		if ($filter === self::FILTER_INITIATOR) {
+			$shares = iter\filter(function (IShare $share) use ($userId) {
+				return $share->getSharedBy() === $userId;
+			}, $shares);
+		}
+		if ($filter === self::FILTER_RECIPIENT) {
+			// We can't check the recipient since this might be a group share etc. However you can't share to yourself
+			$shares = iter\filter(function (IShare $share) use ($userId) {
+				return $share->getShareOwner() !== $userId && $share->getSharedBy() !== $userId;
+			}, $shares);
+		}
+
+		$shares = iter\filter(function (IShare $share) {
+			try {
+				$userFolder = $this->rootFolder->getUserFolder($share->getShareOwner());
+			} catch (NoUserException $e) {
+				return false;
+			} catch (\Throwable $e) {
+				return false;
+			}
+			$nodes = $userFolder->getById($share->getNodeId());
+
+			return $nodes !== [];
+		}, $shares);
+
+		return $shares;
+	}
+
+	public function getSub(string $userId, int $filter, string $path = null): \Iterator {
+		$shares = $this->shareManager->getAllShares();
 
 		// If path is set. Filter for the current user
 		if ($path !== null) {
@@ -156,7 +212,7 @@ class SharesList {
 
 	public function formatShare(IShare $share): array {
 		$userFolder = $this->rootFolder->getUserFolder($share->getShareOwner());
-		
+
 		$data = [
 			'id' => $share->getId(),
 			'file_id' => $share->getNodeId(),
@@ -173,7 +229,7 @@ class SharesList {
 		$data['is_directory'] = $node->getType() === 'dir';
 
 
-		
+
 		if ($share->getShareType() === Share::SHARE_TYPE_USER) {
 			$data['type'] = 'user';
 			$data['recipient'] = $share->getSharedWith();
