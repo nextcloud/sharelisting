@@ -37,7 +37,7 @@ use OCP\Share;
 use OCP\Share\IShare;
 
 class ApiController extends OCSController {
-	
+
 	/** @var IUserSession */
 	protected $userSession;
 
@@ -82,7 +82,7 @@ class ApiController extends OCSController {
 			throw new OCSNotFoundException('User does not exist');
 		}
 
-		$shares = $this->sharesList->get($currentUser->getUID(), SharesList::FILTER_NONE, $path);
+		$shares = $this->sharesList->getSub($currentUser->getUID(), SharesList::FILTER_NONE, $path);
 
 		// format results
 		$formattedShares = iter\map(function (IShare $share) {
