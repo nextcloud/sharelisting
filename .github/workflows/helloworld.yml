@@ -11,7 +11,7 @@ jobs:
     - uses: ./ # Uses an action in the root directory
     - name: Hello world action step
       id: hello
-      uses: rullzer/test_action
+      uses: rullzer/test_action@master
       with:
         who-to-greet: 'Mona the Octocat'
     # Use the output from the `hello` step
