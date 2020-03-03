@@ -15,7 +15,7 @@ exclude = [
 ]
 
 before_cmds = [
-	"composer install --no-dev"
+	"composer install --no-dev",
 	"npm install --deps",
 	"npm run build",
 ]
