@@ -1,10 +1,21 @@
 [package]
 exclude = [
-    ".git",
-    ".gitignore",
-    "Makefile"
+	".drone",
+	".git",
+	".github",
+	".gitignore",
+	".scrutinizer.yml",
+	".travis.yml",
+	".tx",
+	"Makefile",
+	"krankerl.toml",
+	"node_modules",
+	"screenshots",
+	"src"
 ]
 
 before_cmds = [
-    "composer install --no-dev"
+	"composer install --no-dev"
+	"npm install --deps",
+	"npm run build",
 ]
