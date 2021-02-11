@@ -28,18 +28,29 @@ namespace OCA\ShareListing\AppInfo;
 use OCA\Files\Event\LoadSidebar;
 use OCA\ShareListing\Listener\LoadSidebarScript;
 use OCP\AppFramework\App;
+use OCP\AppFramework\Bootstrap\IBootContext;
+use OCP\AppFramework\Bootstrap\IBootstrap;
+use OCP\AppFramework\Bootstrap\IRegistrationContext;
 use OCP\EventDispatcher\IEventDispatcher;
 
-class Application extends App {
+include_once __DIR__ . '/../../vendor/autoload.php';
+
+class Application extends App implements IBootstrap {
 
 	const appID = 'sharelisting';
 
 	public function __construct() {
 		parent::__construct(self::appID);
-		
-		// listen to sidebar loading event
-		$server = $this->getContainer()->getServer();
-		$eventDispatcher = $server->query(IEventDispatcher::class);
-		$eventDispatcher->addServiceListener(LoadSidebar::class, LoadSidebarScript::class);
 	}
+
+	public function register(IRegistrationContext $context): void {
+		$context->registerEventListener(LoadSidebar::class, LoadSidebarScript::class);
+		// TODO: Implement register() method.
+	}
+
+	public function boot(IBootContext $context): void {
+		// TODO: Implement boot() method.
+	}
+
+
 }
