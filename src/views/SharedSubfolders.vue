@@ -51,8 +51,8 @@
 <script>
 import axios from '@nextcloud/axios'
 import { generateUrl, generateOcsUrl } from '@nextcloud/router'
-import ActionButton from 'nextcloud-vue/dist/Components/ActionButton'
-import ActionLink from 'nextcloud-vue/dist/Components/ActionLink'
+import ActionButton from '@nextcloud/vue/dist/Components/ActionButton'
+import ActionLink from '@nextcloud/vue/dist/Components/ActionLink'
 import SharedEntrySimple from '../components/SharingEntrySimple'
 
 export default {
