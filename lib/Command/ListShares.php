@@ -78,16 +78,22 @@ class ListShares extends Command {
 				InputOption::VALUE_OPTIONAL,
 				'Will only consider the given path'
 			)->addOption(
+				'token',
+				't',
+				InputOption::VALUE_OPTIONAL,
+				'Will only consider the given token'
+			)->addOption(
 				'filter',
 				'f',
 				InputOption::VALUE_OPTIONAL,
-				'Filter shares, possible values: owner, initiator, recipient'
+				'Filter shares, possible values: owner, initiator, recipient, token'
 			);
 	}
 
 	protected function execute(InputInterface $input, OutputInterface $output) {
 		$user = $input->getOption('user');
 		$path = $input->getOption('path');
+		$token = $input->getOption('token');
 		$filter = $input->getOption('filter');
 
 		if ($filter === 'owner') {
@@ -100,16 +106,16 @@ class ListShares extends Command {
 			$filter = SharesList::FILTER_NONE;
 		}
 
-		if ($user === null) {
+		if ($user === null && $token === null) {
 			$shares = [];
-			$this->userManager->callForSeenUsers(function (IUser $user) use ($path, $filter, &$shares) {
-				$tmp = $this->sharesList->getFormattedShares($user->getUID(), $filter, $path);
+			$this->userManager->callForSeenUsers(function (IUser $user) use ($token, $path, $filter, &$shares) {
+				$tmp = $this->sharesList->getFormattedShares($user->getUID(), $filter, $path, $token);
 				foreach ($tmp as $share) {
 					$shares[] = $share;
 				}
 			});
 		} else {
-			$shares = iter\toArray($this->sharesList->getFormattedShares($user, $filter, $path));
+			$shares = iter\toArray($this->sharesList->getFormattedShares($user = "", $filter, $path, $token));
 		}
 
 		$output->writeln(json_encode($shares, JSON_PRETTY_PRINT));

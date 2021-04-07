@@ -41,6 +41,7 @@ class SharesList {
 	const FILTER_OWNER = 1;
 	const FILTER_INITIATOR = 2;
 	const FILTER_RECIPIENT = 3;
+	const FILTER_TOKEN = 4;
 
 	/** @var ShareManager */
 	private $shareManager;
@@ -69,7 +70,7 @@ class SharesList {
 		];
 	}
 
-	public function get(string $userId, int $filter, string $path = null): \Iterator {
+	public function get(string $userId, int $filter, string $path = null, string $token = null): \Iterator {
 		$shares = $this->getShares($userId);
 
 		// If path is set. Filter for the current user
@@ -90,6 +91,9 @@ class SharesList {
 				}
 				return false;
 			}, $shares);
+		}
+		if ($token !== null) {
+                        $shares = [$this->shareManager->getShareByToken($token)];
 		}
 
 		if ($filter === self::FILTER_OWNER) {
@@ -131,7 +135,7 @@ class SharesList {
 	 * This allows us to build a list of subfiles/folder that are shared
 	 * as well
 	 */
-	public function getSub(string $userId, int $filter, string $path): \Iterator {
+	public function getSub(string $userId, int $filter, string $path, string $token): \Iterator {
 		$shares = $this->shareManager->getAllShares();
 
 		// If path is set. Filter for the current user
@@ -152,6 +156,9 @@ class SharesList {
 				}
 				return false;
 			}, $shares);
+		}
+		if ($token !== null) {
+                        $shares = [$this->shareManager->getShareByToken($token)];
 		}
 
 		if ($filter === self::FILTER_OWNER) {
@@ -187,8 +194,8 @@ class SharesList {
 		return $shares;
 	}
 
-	public function getFormattedShares(string $userId, int $filter, string $path = null): \Iterator {
-		$shares = $this->get($userId, $filter, $path);
+	public function getFormattedShares(string $userId, int $filter, string $path = null, string $token = null): \Iterator {
+		$shares = $this->get($userId, $filter, $path, $token);
 
 		$formattedShares = iter\map(function (IShare $share) {
 			return $this->formatShare($share);
