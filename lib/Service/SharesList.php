@@ -158,7 +158,7 @@ class SharesList {
 			}, $shares);
 		}
 		if ($token !== null) {
-                        $shares = [$this->shareManager->getShareByToken($token)];
+			$shares = [$this->shareManager->getShareByToken($token)];
 		}
 
 		if ($filter === self::FILTER_OWNER) {
