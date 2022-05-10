@@ -1,0 +1,131 @@
+<?php
+
+declare(strict_types=1);
+/**
+ * @copyright Copyright (c) 2021 Robin Appelman <robin@icewind.nl>
+ *
+ * @license GNU AGPL version 3 or any later version
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
+namespace {
+
+	use OCP\IServerContainer;
+
+	class OC {
+		static $CLI = false;
+		/** @var IServerContainer */
+		static $server;
+	}
+}
+
+namespace OC\User {
+    class NoUserException extends \Exception {}
+}
+
+namespace OCA\Files\Event {
+    class LoadSidebar extends \OCP\EventDispatcher\Event {}
+}
+
+namespace OC\Files\Node {
+	use OCP\Files\FileInfo;
+	abstract class Node implements \OCP\Files\Node {
+		/** @return FileInfo|\ArrayAccess */
+		public function getFileInfo() {}
+
+		/** @return \OCP\Files\Mount\IMountPoint */
+		public function getMountPoint() {}
+	}
+}
+
+namespace OC\Hooks {
+	class Emitter {
+		public function emit(string $class, string $value, array $option) {}
+		/** Closure $closure */
+		public function listen(string $class, string $value, $closure) {}
+	}
+	class BasicEmitter extends Emitter {
+	}
+}
+
+namespace OC\Cache {
+	class CappedMemoryCache {
+		public function get($key) {}
+		public function set($key, $value, $ttl = '') {}
+	}
+}
+
+namespace OC\Core\Command {
+	use Symfony\Component\Console\Input\InputInterface;
+	use Symfony\Component\Console\Output\OutputInterface;
+	class Base {
+		public const OUTPUT_FORMAT_PLAIN = 'plain';
+		public const OUTPUT_FORMAT_JSON = 'json';
+		public const OUTPUT_FORMAT_JSON_PRETTY = 'json_pretty';
+
+		public function __construct() {}
+		protected function configure() {}
+		public function run(InputInterface $input, OutputInterface $output) {}
+		public function setName(string $name) {}
+		public function getHelper(string $name) {}
+		protected function writeArrayInOutputFormat(InputInterface $input, OutputInterface $output, $items, $prefix = '  - ') {
+		}
+	}
+}
+
+namespace OC\Files\ObjectStore {
+	class NoopScanner {}
+}
+
+namespace Symfony\Component\Console\Helper {
+	use Symfony\Component\Console\Output\OutputInterface;
+	class Table {
+		public function __construct(OutputInterface $text) {}
+		public function setHeaders(array $header) {}
+		public function setRows(array $rows) {}
+		public function render() {}
+	}
+}
+
+namespace Symfony\Component\Console\Input {
+	class InputInterface {
+		public function getOption(string $key) {}
+		public function getArgument(string $key) {}
+	}
+	class InputArgument {
+		const REQUIRED = 0;
+		const OPTIONAL = 1;
+		const IS_ARRAY = 1;
+	}
+	class InputOption {
+		const VALUE_NONE = 1;
+		const VALUE_REQUIRED = 1;
+		const VALUE_OPTIONAL = 1;
+	}
+}
+
+namespace Symfony\Component\Console\Question {
+	class ConfirmationQuestion {
+		public function __construct(string $text, bool $default) {}
+	}
+}
+
+namespace Symfony\Component\Console\Output {
+	class OutputInterface {
+		public const VERBOSITY_VERBOSE = 1;
+		public function writeln(string $text, int $flat = 0) {}
+	}
+}
