@@ -135,31 +135,27 @@ class SharesList {
 	 * This allows us to build a list of subfiles/folder that are shared
 	 * as well
 	 */
-	public function getSub(string $userId, int $filter, string $path, string $token): \Iterator {
+	public function getSub(string $userId, int $filter, string $path): \Iterator {
 		$shares = $this->shareManager->getAllShares();
 
 		// If path is set. Filter for the current user
-		if ($path !== null) {
-			$userFolder = $this->rootFolder->getUserFolder($userId);
-			try {
-				$node = $userFolder->get($path);
-			} catch (NotFoundException $e) {
-				// Path is not valid for user so nothing to report;
-				return new \EmptyIterator();
-			}
-			$shares = iter\filter(function (IShare $share) use ($node) {
-				if ($node->getId() === $share->getNodeId()) {
-					return false;
-				}
-				if ($node instanceof Folder) {
-					return !empty($node->getById($share->getNodeId()));
-				}
+		$userFolder = $this->rootFolder->getUserFolder($userId);
+		try {
+			$node = $userFolder->get($path);
+		} catch (NotFoundException $e) {
+			// Path is not valid for user so nothing to report;
+			return new \EmptyIterator();
+		}
+
+		$shares = iter\filter(function (IShare $share) use ($node) {
+			if ($node->getId() === $share->getNodeId()) {
 				return false;
-			}, $shares);
-		}
-		if ($token !== null) {
-			$shares = [$this->shareManager->getShareByToken($token)];
-		}
+			}
+			if ($node instanceof Folder) {
+				return !empty($node->getById($share->getNodeId()));
+			}
+			return false;
+		}, $shares);
 
 		if ($filter === self::FILTER_OWNER) {
 			$shares = iter\filter(function (IShare $share) use ($userId) {
@@ -214,7 +210,7 @@ class SharesList {
 				yield $share;
 			}
 
-			if ($shareType !== \OCP\Share::SHARE_TYPE_LINK) {
+			if ($shareType !== \OCP\Share\IShare::TYPE_LINK) {
 				$shares = $this->shareManager->getSharedWith($userId, $shareType, null, -1, 0);
 				foreach ($shares as $share) {
 					yield $share;
@@ -243,24 +239,24 @@ class SharesList {
 
 
 
-		if ($share->getShareType() === Share::SHARE_TYPE_USER) {
+		if ($share->getShareType() === IShare::TYPE_USER) {
 			$data['type'] = 'user';
 			$data['recipient'] = $share->getSharedWith();
 		}
-		if ($share->getShareType() === Share::SHARE_TYPE_GROUP) {
+		if ($share->getShareType() === IShare::TYPE_GROUP) {
 			$data['type'] = 'group';
 			$data['recipient'] = $share->getSharedWith();
 		}
-		if ($share->getShareType() === Share::SHARE_TYPE_LINK) {
+		if ($share->getShareType() === IShare::TYPE_LINK) {
 			$data['type'] = 'link';
 			$data['token'] = $share->getToken();
 		}
-		if ($share->getShareType() === Share::SHARE_TYPE_EMAIL) {
+		if ($share->getShareType() === IShare::TYPE_EMAIL) {
 			$data['type'] = 'email';
 			$data['recipient'] = $share->getSharedWith();
 			$data['token'] = $share->getToken();
 		}
-		if ($share->getShareType() === Share::SHARE_TYPE_REMOTE) {
+		if ($share->getShareType() === IShare::TYPE_REMOTE) {
 			$data['type'] = 'federated';
 			$data['recipient'] = $share->getSharedWith();
 		}

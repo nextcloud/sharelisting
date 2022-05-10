@@ -31,12 +31,13 @@ use OCP\Files\IRootFolder;
 use OCP\IUser;
 use OCP\IUserManager;
 use OCP\Share\IManager as ShareManager;
+use OC\Core\Command\Base;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class ListShares extends Command {
+class ListShares extends Base {
 
 	/** @var ShareManager */
 	private $shareManager;
@@ -90,7 +91,7 @@ class ListShares extends Command {
 			);
 	}
 
-	protected function execute(InputInterface $input, OutputInterface $output) {
+	public function run(InputInterface $input, OutputInterface $output) {
 		$user = $input->getOption('user');
 		$path = $input->getOption('path');
 		$token = $input->getOption('token');

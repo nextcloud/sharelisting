@@ -51,7 +51,7 @@ class ApiController extends OCSController {
 	 * @param string $appName
 	 * @param IRequest $request
 	 * @param IUserSession $userSession
-	 * @param IManager $userManager
+	 * @param IUserManager $userManager
 	 * @param SharesList $sharesList
 	 */
 	public function __construct(string $appName,
