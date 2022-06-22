@@ -65,7 +65,7 @@ Listing all shares user0 is a participant in (be it owner, initiator or recipien
 ]
 ```
 
-###Example 2
+### Example 2
 
 Listing all shares user0 is a participant in (be it owner, initiator or recipient) limited to the path `F1`
 
