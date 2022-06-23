@@ -155,7 +155,7 @@ export default {
 		 *
 		 * @param {string} dir the absolute url to the folder
 		 * @param {number} fileid the node id
-		 * @returns {string}
+		 * @return {string}
 		 */
 		generateFileUrl(dir, fileid) {
 			return generateUrl('/apps/files?dir={dir}&fileid={fileid}', { dir, fileid })

@@ -3,7 +3,7 @@
  *
  * @author John Molakvoæ <skjnldsv@protonmail.com>
  *
- * @license GNU AGPL version 3 or any later version
+ * @license AGPL-3.0-or-later
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -21,18 +21,21 @@
  */
 import Vue from 'vue'
 import { translate, translatePlural } from '@nextcloud/l10n'
-import SharedSubfolders from './views/SharedSubfolders'
 
 Vue.prototype.t = translate
 Vue.prototype.n = translatePlural
 
 window.addEventListener('DOMContentLoaded', () => {
-	if (OCA.Sharing && OCA.Sharing.ShareTabSections) {
+	if (!OCA?.Sharing?.ShareTabSections) {
+		return
+	}
+
+	import(/* webpackChunkName: "sharing" */'./views/SharedSubfolders').then((Module) => {
 		OCA.Sharing.ShareTabSections.registerSection((el, fileInfo) => {
 			if (fileInfo.isDirectory() !== true) {
 				return
 			}
-			return SharedSubfolders
+			return Module.default
 		})
-	}
+	})
 })

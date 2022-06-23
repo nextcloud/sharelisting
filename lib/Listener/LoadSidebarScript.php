@@ -36,7 +36,7 @@ class LoadSidebarScript implements IEventListener {
 			return;
 		}
 
-		Util::addScript(Application::appID, Application::appID);
+		Util::addScript(Application::appID, 'sharelisting-main');
 		Util::addStyle(Application::appID, 'icons');
 	}
 }
