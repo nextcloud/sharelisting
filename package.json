@@ -32,6 +32,9 @@
 		"jest-serializer-vue": "^2.0.2",
 		"vue-jest": "^3.0.7"
 	},
+	"browserslist": [
+		"extends @nextcloud/browserslist-config"
+	],
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/rullzer/sharelisting.git"
