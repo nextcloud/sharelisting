@@ -119,6 +119,6 @@ class ListShares extends Base {
 			$shares = iter\toArray($this->sharesList->getFormattedShares($user = "", $filter, $path, $token));
 		}
 
-		$output->writeln(json_encode($shares, JSON_PRETTY_PRINT));
+		$output->writeln(json_encode($shares, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
 	}
 }
