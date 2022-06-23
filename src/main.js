@@ -21,18 +21,21 @@
  */
 import Vue from 'vue'
 import { translate, translatePlural } from '@nextcloud/l10n'
-import SharedSubfolders from './views/SharedSubfolders'
 
 Vue.prototype.t = translate
 Vue.prototype.n = translatePlural
 
 window.addEventListener('DOMContentLoaded', () => {
-	if (OCA.Sharing && OCA.Sharing.ShareTabSections) {
+	if (!OCA?.Sharing?.ShareTabSections) {
+		return
+	}
+
+	import(/* webpackChunkName: "sharing" */'./views/SharedSubfolders').then((Module) => {
 		OCA.Sharing.ShareTabSections.registerSection((el, fileInfo) => {
 			if (fileInfo.isDirectory() !== true) {
 				return
 			}
-			return SharedSubfolders
+			return Module.default
 		})
-	}
+	})
 })
