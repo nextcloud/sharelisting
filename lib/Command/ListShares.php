@@ -89,9 +89,10 @@ class ListShares extends Base {
 				InputOption::VALUE_OPTIONAL,
 				'Filter shares, possible values: owner, initiator, recipient, token'
 			);
+		parent::configure();
 	}
 
-	public function run(InputInterface $input, OutputInterface $output) {
+	protected function execute(InputInterface $input, OutputInterface $output): int {
 		$user = $input->getOption('user');
 		$path = $input->getOption('path');
 		$token = $input->getOption('token');
@@ -120,5 +121,6 @@ class ListShares extends Base {
 		}
 
 		$output->writeln(json_encode($shares, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+		return 0;
 	}
 }

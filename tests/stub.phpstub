@@ -78,7 +78,7 @@ namespace OC\Core\Command {
 
 		public function __construct() {}
 		protected function configure() {}
-		public function run(InputInterface $input, OutputInterface $output) {}
+		protected function execute(InputInterface $input, OutputInterface $output): int {}
 		public function setName(string $name) {}
 		public function getHelper(string $name) {}
 		protected function writeArrayInOutputFormat(InputInterface $input, OutputInterface $output, $items, $prefix = '  - ') {
