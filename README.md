@@ -225,8 +225,3 @@ List all shares that user0 is the initiator of in the path F1 (of that user).
     }
 ]
 ```
-
-Open questions:
-
-- Can --path be given without --user? Example 4 "in the path of that user" seemst to thwart that.
-- Shouldn't example 4 better be the first one?
