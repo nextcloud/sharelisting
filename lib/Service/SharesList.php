@@ -190,7 +190,7 @@ class SharesList {
 		return $shares;
 	}
 
-	public function getFormattedShares(string $userId, int $filter, string $path = null, string $token = null): \Iterator {
+	public function getFormattedShares(string $userId = '', int $filter, string $path = null, string $token = null): \Iterator {
 		$shares = $this->get($userId, $filter, $path, $token);
 
 		$formattedShares = iter\map(function (IShare $share) {
