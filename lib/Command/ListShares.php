@@ -87,7 +87,7 @@ class ListShares extends Base {
 				'filter',
 				'f',
 				InputOption::VALUE_OPTIONAL,
-				'Filter shares, possible values: owner, initiator, recipient, token'
+				'Filter shares, possible values: owner, initiator, recipient, token, has-expiration, no-expiration'
 			);
 		parent::configure();
 	}
@@ -104,6 +104,10 @@ class ListShares extends Base {
 			$filter = SharesList::FILTER_INITIATOR;
 		} else if ($filter === 'recipient') {
 			$filter = SharesList::FILTER_RECIPIENT;
+		} else if ($filter === 'has-expiration') {
+			$filter = SharesList::FILTER_HAS_EXPIRATION;
+		} else if ($filter === 'no-expiration') {
+			$filter = SharesList::FILTER_NO_EXPIRATION;
 		} else {
 			$filter = SharesList::FILTER_NONE;
 		}
