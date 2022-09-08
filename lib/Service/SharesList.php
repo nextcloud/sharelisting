@@ -42,6 +42,8 @@ class SharesList {
 	const FILTER_INITIATOR = 2;
 	const FILTER_RECIPIENT = 3;
 	const FILTER_TOKEN = 4;
+	const FILTER_HAS_EXPIRATION = 5;
+	const FILTER_NO_EXPIRATION = 6;
 
 	/** @var ShareManager */
 	private $shareManager;
@@ -93,7 +95,7 @@ class SharesList {
 			}, $shares);
 		}
 		if ($token !== null) {
-                        $shares = [$this->shareManager->getShareByToken($token)];
+			$shares = [$this->shareManager->getShareByToken($token)];
 		}
 
 		if ($filter === self::FILTER_OWNER) {
@@ -113,7 +115,19 @@ class SharesList {
 			}, $shares);
 		}
 
-		$shares = iter\filter(function (IShare $share) {
+		if ($filter === self::FILTER_HAS_EXPIRATION) {
+			$shares = iter\filter(function (IShare $share) use ($userId): bool {
+				return $share->getExpirationDate() !== null;
+			}, $shares);
+		}
+
+		if ($filter === self::FILTER_NO_EXPIRATION) {
+			$shares = iter\filter(function (IShare $share) use ($userId): bool {
+				return $share->getExpirationDate() === null;
+			}, $shares);
+		}
+
+		$shares = iter\filter(function (IShare $share): bool {
 			try {
 				$userFolder = $this->rootFolder->getUserFolder($share->getShareOwner());
 			} catch (NoUserException $e) {
@@ -190,10 +204,10 @@ class SharesList {
 		return $shares;
 	}
 
-	public function getFormattedShares(string $userId = '', int $filter, string $path = null, string $token = null): \Iterator {
+	public function getFormattedShares(string $userId = '', int $filter = self::FILTER_NONE, string $path = null, string $token = null): \Iterator {
 		$shares = $this->get($userId, $filter, $path, $token);
 
-		$formattedShares = iter\map(function (IShare $share) {
+		$formattedShares = iter\map(function (IShare $share): array {
 			return $this->formatShare($share);
 		}, $shares);
 
@@ -259,6 +273,10 @@ class SharesList {
 		if ($share->getShareType() === IShare::TYPE_REMOTE) {
 			$data['type'] = 'federated';
 			$data['recipient'] = $share->getSharedWith();
+		}
+
+		if ($share->getExpirationDate() !== null) {
+			$data['expiration'] = $share->getExpirationDate()->format('Y-m-d H:i:s');
 		}
 
 		return $data;
