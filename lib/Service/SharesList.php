@@ -113,7 +113,7 @@ class SharesList {
 			}, $shares);
 		}
 
-		$shares = iter\filter(function (IShare $share) {
+		$shares = iter\filter(function (IShare $share): bool {
 			try {
 				$userFolder = $this->rootFolder->getUserFolder($share->getShareOwner());
 			} catch (NoUserException $e) {
@@ -259,6 +259,10 @@ class SharesList {
 		if ($share->getShareType() === IShare::TYPE_REMOTE) {
 			$data['type'] = 'federated';
 			$data['recipient'] = $share->getSharedWith();
+		}
+
+		if ($share->getExpirationDate() !== null) {
+			$data['expiration'] = $share->getExpirationDate()->format('Y-m-d H:i:s');
 		}
 
 		return $data;
