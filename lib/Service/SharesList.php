@@ -119,6 +119,18 @@ class SharesList {
 			}, $shares);
 		}
 
+		if ($filter === self::FILTER_HAS_EXPIRATION) {
+			$shares = iter\filter(function (IShare $share) use ($userId): bool {
+				return $share->getExpirationDate() !== null;
+			}, $shares);
+		}
+
+		if ($filter === self::FILTER_NO_EXPIRATION) {
+			$shares = iter\filter(function (IShare $share) use ($userId): bool {
+				return $share->getExpirationDate() === null;
+			}, $shares);
+		}
+
 		$shares = iter\filter(function (IShare $share): bool {
 			try {
 				$userFolder = $this->rootFolder->getUserFolder($share->getShareOwner());
@@ -196,7 +208,7 @@ class SharesList {
 		return $shares;
 	}
 
-	public function getFormattedShares(?string $userId = '', int $filter = self::FILTER_NONE, string $path = null, string $token = null): \Iterator {
+	public function getFormattedShares(string $userId = '', int $filter = self::FILTER_NONE, string $path = null, string $token = null): \Iterator {
 		$shares = $this->get($userId, $filter, $path, $token);
 
 		$formattedShares = iter\map(function (IShare $share): array {
