@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 /**
+ * @copyright Copyright (c) 2022 Solution Libre SAS
  * @copyright Copyright (c) 2018 Roeland Jago Douma <roeland@famdouma.nl>
  *
  * @author Florent Poinsaut <florent@solution-libre.fr>
@@ -26,19 +27,18 @@ declare(strict_types=1);
 
 namespace OCA\ShareListing\Command;
 
-use iter;
+use OCA\ShareListing\Service\ReportSender;
 use OCA\ShareListing\Service\SharesList;
 use OCP\Files\IRootFolder;
 use OCP\IUser;
 use OCP\IUserManager;
 use OCP\Share\IManager as ShareManager;
 use OC\Core\Command\Base;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class ListShares extends Base {
+class SendShares extends Base {
 
 	/** @var ShareManager */
 	private $shareManager;
@@ -49,25 +49,37 @@ class ListShares extends Base {
 	/** @var IRootFolder */
 	private $rootFolder;
 
+	/** @var ReportSender */
+	private $reportSender;
+
 	/** @var SharesList */
 	private $sharesList;
 
-	public function __construct(ShareManager $shareManager,
-								IUserManager $userManager,
-								IRootFolder $rootFolder,
-								SharesList $sharesList) {
+	public function __construct(
+		ShareManager $shareManager,
+		IUserManager $userManager,
+		IRootFolder $rootFolder,
+		ReportSender $reportSender,
+		SharesList $sharesList
+	) {
 		parent::__construct();
 
 		$this->shareManager = $shareManager;
 		$this->userManager = $userManager;
 		$this->rootFolder = $rootFolder;
+		$this->reportSender = $reportSender;
 		$this->sharesList = $sharesList;
-
 	}
 
 	public function configure() {
-		$this->setName('sharing:list')
-			->setDescription('List who has access to shares by owner')
+		$this->setName('sharing:send')
+			->setDescription('Send list who has access to shares by owner')
+			->addOption(
+				'recipients',
+				'r',
+				InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
+				'Email recipients'
+			)
 			->addOption(
 				'user',
 				'u',
@@ -94,24 +106,42 @@ class ListShares extends Base {
 	}
 
 	protected function execute(InputInterface $input, OutputInterface $output): int {
+		$this->checkAllRequiredOptionsAreNotEmpty($input);
+
 		$user = $input->getOption('user');
 		$path = $input->getOption('path');
 		$token = $input->getOption('token');
 		$filter = $this->sharesList->filterStringToInt($input->getOption('filter'));
+		$recipients = $input->getOption('recipients');
 
-		if ($user === null && $token === null) {
-			$shares = [];
-			$this->userManager->callForSeenUsers(function (IUser $user) use ($token, $path, $filter, &$shares) {
-				$tmp = $this->sharesList->getFormattedShares($user->getUID(), $filter, $path, $token);
-				foreach ($tmp as $share) {
-					$shares[] = $share;
-				}
-			});
-		} else {
-			$shares = iter\toArray($this->sharesList->getFormattedShares($user, $filter, $path, $token));
-		}
+		$this->reportSender->sendReport(
+			$recipients,
+			$user,
+			$filter,
+			$path,
+			$token
+		);
 
-		$output->writeln(json_encode($shares, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
 		return 0;
 	}
+
+	private function checkAllRequiredOptionsAreNotEmpty(InputInterface $input)
+    {
+        $errors = [];
+        $recipients = $this->getDefinition()->getOption('recipients');
+
+        /** @var InputOption $recipient */
+        foreach ([$recipients] as $recipient) {
+            $name = $recipient->getName();
+            $value = $input->getOption($name);
+
+            if ($value === null || $value === '' || ($recipient->isArray() && empty($value))) {
+                $errors[] = sprintf('The required option --%s is not set or is empty', $name);
+            }
+        }
+
+        if (count($errors)) {
+            throw new \InvalidArgumentException(implode("\n\n", $errors));
+        }
+    }
 }
