@@ -35,6 +35,9 @@ use OCP\IUserManager;
 use OCP\Share;
 use OCP\Share\IManager as ShareManager;
 use OCP\Share\IShare;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Encoder\CsvEncoder;
+use Symfony\Component\Serializer\Serializer;
 
 class SharesList {
 
@@ -306,5 +309,23 @@ class SharesList {
 		}
 
 		return $filter;
+	}
+
+	public function getSerializedShares(array $shares, ?string $format = 'json'): string
+	{
+		switch ($format) {
+			case 'csv':
+				$encoders = [new CsvEncoder()];
+				$context = [];
+				break;
+			default:
+				$encoders = [new JsonEncoder()];
+				$format = 'json';
+				$context = ['json_encode_options' => JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE];
+				break;
+		}
+
+		$serializer = new Serializer([], $encoders);
+		return $serializer->serialize($shares, $format, $context);
 	}
 }

@@ -89,8 +89,14 @@ class ListShares extends Base {
 				'f',
 				InputOption::VALUE_OPTIONAL,
 				'Filter shares, possible values: owner, initiator, recipient, token, has-expiration, no-expiration'
+			)
+			->addOption(
+				'output',
+				'o',
+				InputOption::VALUE_OPTIONAL,
+				'Output format (json or csv, default is json)',
+				'json'
 			);
-		parent::configure();
 	}
 
 	protected function execute(InputInterface $input, OutputInterface $output): int {
@@ -98,6 +104,7 @@ class ListShares extends Base {
 		$path = $input->getOption('path');
 		$token = $input->getOption('token');
 		$filter = $this->sharesList->filterStringToInt($input->getOption('filter'));
+		$outputOpt = $input->getOption('output');
 
 		if ($user === null && $token === null) {
 			$shares = [];
@@ -111,7 +118,7 @@ class ListShares extends Base {
 			$shares = iter\toArray($this->sharesList->getFormattedShares($user, $filter, $path, $token));
 		}
 
-		$output->writeln(json_encode($shares, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+		$output->writeln($this->sharesList->getSerializedShares($shares, $outputOpt));
 		return 0;
 	}
 }

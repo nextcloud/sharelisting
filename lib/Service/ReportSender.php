@@ -37,9 +37,6 @@ use OCP\L10N\IFactory;
 use OCP\Mail\IMailer;
 use OCP\Util;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Serializer\Encoder\JsonEncoder;
-use Symfony\Component\Serializer\Encoder\CsvEncoder;
-use Symfony\Component\Serializer\Serializer;
 
 class ReportSender {
 	public const ACTIVITY_LIMIT = 20;
@@ -110,15 +107,13 @@ class ReportSender {
 			$shares = iter\toArray($this->sharesList->getFormattedShares($userId, $filter, $path, $token));
 		}
 
-		$encoders = [new CsvEncoder(), new JsonEncoder()];
-		$serializer = new Serializer([], $encoders);
 		$json_attachment = $this->mailer->createAttachment(
-			$serializer->serialize($shares, 'json', ['json_encode_options' => JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE]),
+			$this->sharesList->getSerializedShares($shares, 'json'),
 			'report.json',
 			'application/json; charset=utf-8'
 		);
 		$csv_attachment = $this->mailer->createAttachment(
-			$serializer->serialize($shares, 'csv', []),
+			$this->sharesList->getSerializedShares($shares, 'csv'),
 			'report.csv',
 			'text/csv; charset=utf-8'
 		);

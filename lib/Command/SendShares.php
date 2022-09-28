@@ -102,7 +102,6 @@ class SendShares extends Base {
 				InputOption::VALUE_OPTIONAL,
 				'Filter shares, possible values: owner, initiator, recipient, token, has-expiration, no-expiration'
 			);
-		parent::configure();
 	}
 
 	protected function execute(InputInterface $input, OutputInterface $output): int {
