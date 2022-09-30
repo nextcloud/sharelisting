@@ -2,18 +2,18 @@
 
 This app allows generating reports of shares on the system.
 
-
 ## Usage
 
-#### Command:
-```
-./occ sharing:list [-u|--user [USER]] [-p|--path [PATH]] [-t|--token [TOKEN]] [-f|--filter [FILTER]]
+### Command
+
+```sh
+./occ sharing:list [-u|--user [USER]] [-p|--path [PATH]] [-t|--token [TOKEN]] [-f|--filter [FILTER]] [-o|--output FORMAT]
 ```
 
 Without options, the command yields the unfiltered list of all shares.\
 With options, the list is narrowed down using the filters set.
 
-#### Options:
+### Options
 
 * `-u [USER]` or `--user [USER]`\
   List only shares of the given user.
@@ -24,13 +24,14 @@ With options, the list is narrowed down using the filters set.
 * `-f [FILTER]` or `--filter [FILTER]`\
   List only shares where the TYPE matches the argument.\
   Possible values for the filter argument: {owner, initiator, recipient}
-
+* `-o FORMAT` or `--output FORMAT`\
+  Set the output format (json or csv, default is json).
 
 ## Examples
 
 To better illustrate how the app work see the examples below:
 
-### Example 1 
+### Example 1
 
 Listing all shares user0 is a participant in (be it owner, initiator or recipient):
 
@@ -115,7 +116,8 @@ Listing all shares user0 is a participant in (be it owner, initiator or recipien
 ]
 ```
 
-### Example 3:
+### Example 3
+
 List all info about all shares
 
 `./occ sharing:list`
