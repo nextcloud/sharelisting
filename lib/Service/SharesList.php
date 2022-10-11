@@ -3,6 +3,7 @@ declare(strict_types=1);
 /**
  * @copyright Copyright (c) 2018 Roeland Jago Douma <roeland@famdouma.nl>
  *
+ * @author Florent Poinsaut <florent@solution-libre.fr>
  * @author Roeland Jago Douma <roeland@famdouma.nl>
  * @author John Molakvoæ <skjnldsv@protonmail.com>
  *
@@ -34,6 +35,9 @@ use OCP\IUserManager;
 use OCP\Share;
 use OCP\Share\IManager as ShareManager;
 use OCP\Share\IShare;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Encoder\CsvEncoder;
+use Symfony\Component\Serializer\Serializer;
 
 class SharesList {
 
@@ -280,5 +284,48 @@ class SharesList {
 		}
 
 		return $data;
+	}
+
+	public function filterStringToInt(?string $filterString): int {
+		switch ($filterString) {
+			case 'owner':
+				$filter = SharesList::FILTER_OWNER;
+				break;
+			case 'initiator':
+				$filter = SharesList::FILTER_INITIATOR;
+				break;
+			case 'recipient':
+				$filter = SharesList::FILTER_RECIPIENT;
+				break;
+			case 'has-expiration':
+				$filter = SharesList::FILTER_HAS_EXPIRATION;
+				break;
+			case 'no-expiration':
+				$filter = SharesList::FILTER_NO_EXPIRATION;
+				break;
+			default:
+				$filter = SharesList::FILTER_NONE;
+				break;
+		}
+
+		return $filter;
+	}
+
+	public function getSerializedShares(array $shares, ?string $format = 'json'): string
+	{
+		switch ($format) {
+			case 'csv':
+				$encoders = [new CsvEncoder()];
+				$context = [];
+				break;
+			default:
+				$encoders = [new JsonEncoder()];
+				$format = 'json';
+				$context = ['json_encode_options' => JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE];
+				break;
+		}
+
+		$serializer = new Serializer([], $encoders);
+		return $serializer->serialize($shares, $format, $context);
 	}
 }

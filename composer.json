@@ -3,7 +3,8 @@
   "description": "3rdparty components for sharelisting",
   "license": "MIT",
   "require": {
-    "nikic/iter": "^2.2"
+    "nikic/iter": "^2.2",
+    "symfony/serializer": "^5.4"
   },
   "require-dev": {
     "phpunit/phpunit": "^9",
