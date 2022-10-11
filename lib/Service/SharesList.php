@@ -3,6 +3,7 @@ declare(strict_types=1);
 /**
  * @copyright Copyright (c) 2018 Roeland Jago Douma <roeland@famdouma.nl>
  *
+ * @author Florent Poinsaut <florent@solution-libre.fr>
  * @author Roeland Jago Douma <roeland@famdouma.nl>
  * @author John Molakvoæ <skjnldsv@protonmail.com>
  *
@@ -34,6 +35,9 @@ use OCP\IUserManager;
 use OCP\Share;
 use OCP\Share\IManager as ShareManager;
 use OCP\Share\IShare;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Encoder\CsvEncoder;
+use Symfony\Component\Serializer\Serializer;
 
 class SharesList {
 
@@ -72,7 +76,7 @@ class SharesList {
 		];
 	}
 
-	public function get(string $userId, int $filter, string $path = null, string $token = null): \Iterator {
+	public function get(?string $userId, int $filter, string $path = null, string $token = null): \Iterator {
 		$shares = $this->getShares($userId);
 
 		// If path is set. Filter for the current user
@@ -204,7 +208,7 @@ class SharesList {
 		return $shares;
 	}
 
-	public function getFormattedShares(string $userId = '', int $filter = self::FILTER_NONE, string $path = null, string $token = null): \Iterator {
+	public function getFormattedShares(?string $userId = '', int $filter = self::FILTER_NONE, string $path = null, string $token = null): \Iterator {
 		$shares = $this->get($userId, $filter, $path, $token);
 
 		$formattedShares = iter\map(function (IShare $share): array {
@@ -214,22 +218,27 @@ class SharesList {
 		return $formattedShares;
 	}
 
-	private function getShares(string $userId): \Iterator {
-		$shareTypes = $this->getShareTypes();
+	private function getShares(?string $userId): \Iterator {
+		if (empty($userId)) {
+			$shares = $this->shareManager->getAllShares();
+		} else {
+			$shareTypes = $this->getShareTypes();
 
-		foreach ($shareTypes as $shareType) {
-			$shares = $this->shareManager->getSharesBy($userId, $shareType, null, true, -1, 0);
+			foreach ($shareTypes as $shareType) {
+				$shares = $this->shareManager->getSharesBy($userId, $shareType, null, true, -1, 0);
 
-			foreach ($shares as $share) {
-				yield $share;
-			}
+				if ($shareType !== \OCP\Share\IShare::TYPE_LINK) {
+					foreach ($shares as $share) {
+						yield $share;
+					}
 
-			if ($shareType !== \OCP\Share\IShare::TYPE_LINK) {
-				$shares = $this->shareManager->getSharedWith($userId, $shareType, null, -1, 0);
-				foreach ($shares as $share) {
-					yield $share;
+					$shares = $this->shareManager->getSharedWith($userId, $shareType, null, -1, 0);
 				}
 			}
+		}
+
+		foreach ($shares as $share) {
+			yield $share;
 		}
 	}
 

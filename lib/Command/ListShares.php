@@ -3,6 +3,7 @@ declare(strict_types=1);
 /**
  * @copyright Copyright (c) 2018 Roeland Jago Douma <roeland@famdouma.nl>
  *
+ * @author Florent Poinsaut <florent@solution-libre.fr>
  * @author Roeland Jago Douma <roeland@famdouma.nl>
  * @author John Molakvoæ <skjnldsv@protonmail.com>
  *
@@ -112,17 +113,7 @@ class ListShares extends Base {
 			$filter = SharesList::FILTER_NONE;
 		}
 
-		if ($user === null && $token === null) {
-			$shares = [];
-			$this->userManager->callForSeenUsers(function (IUser $user) use ($token, $path, $filter, &$shares) {
-				$tmp = $this->sharesList->getFormattedShares($user->getUID(), $filter, $path, $token);
-				foreach ($tmp as $share) {
-					$shares[] = $share;
-				}
-			});
-		} else {
-			$shares = iter\toArray($this->sharesList->getFormattedShares($user, $filter, $path, $token));
-		}
+		$shares = iter\toArray($this->sharesList->getFormattedShares($user, $filter, $path, $token));
 
 		$output->writeln(json_encode($shares, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
 		return 0;
