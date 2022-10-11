@@ -89,6 +89,13 @@ class ListShares extends Base {
 				'f',
 				InputOption::VALUE_OPTIONAL,
 				'Filter shares, possible values: owner, initiator, recipient, token, has-expiration, no-expiration'
+			)
+			->addOption(
+				'output',
+				'o',
+				InputOption::VALUE_OPTIONAL,
+				'Output format (json or csv, default is json)',
+				'json'
 			);
 	}
 
@@ -96,21 +103,8 @@ class ListShares extends Base {
 		$user = $input->getOption('user');
 		$path = $input->getOption('path');
 		$token = $input->getOption('token');
-		$filter = $input->getOption('filter');
-
-		if ($filter === 'owner') {
-			$filter = SharesList::FILTER_OWNER;
-		} elseif ($filter === 'initiator') {
-			$filter = SharesList::FILTER_INITIATOR;
-		} else if ($filter === 'recipient') {
-			$filter = SharesList::FILTER_RECIPIENT;
-		} else if ($filter === 'has-expiration') {
-			$filter = SharesList::FILTER_HAS_EXPIRATION;
-		} else if ($filter === 'no-expiration') {
-			$filter = SharesList::FILTER_NO_EXPIRATION;
-		} else {
-			$filter = SharesList::FILTER_NONE;
-		}
+		$filter = $this->sharesList->filterStringToInt($input->getOption('filter'));
+		$outputOpt = $input->getOption('output');
 
 		$shares = iter\toArray($this->sharesList->getFormattedShares($user, $filter, $path, $token));
 
