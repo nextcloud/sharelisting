@@ -106,17 +106,7 @@ class ListShares extends Base {
 		$filter = $this->sharesList->filterStringToInt($input->getOption('filter'));
 		$outputOpt = $input->getOption('output');
 
-		if ($user === null && $token === null) {
-			$shares = [];
-			$this->userManager->callForSeenUsers(function (IUser $user) use ($token, $path, $filter, &$shares) {
-				$tmp = $this->sharesList->getFormattedShares($user->getUID(), $filter, $path, $token);
-				foreach ($tmp as $share) {
-					$shares[] = $share;
-				}
-			});
-		} else {
-			$shares = iter\toArray($this->sharesList->getFormattedShares($user, $filter, $path, $token));
-		}
+		$shares = iter\toArray($this->sharesList->getFormattedShares($user, $filter, $path, $token));
 
 		$output->writeln($this->sharesList->getSerializedShares($shares, $outputOpt));
 		return 0;
