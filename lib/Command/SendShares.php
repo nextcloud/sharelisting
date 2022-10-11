@@ -78,7 +78,13 @@ class SendShares extends Base {
 				'recipients',
 				'r',
 				InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
-				'Email recipients'
+				'Recipients users of generated reports'
+			)
+			->addOption(
+				'target-path',
+				'x',
+				InputOption::VALUE_REQUIRED,
+				'Generated reports will be stored on this path'
 			)
 			->addOption(
 				'user',
@@ -112,31 +118,51 @@ class SendShares extends Base {
 		$token = $input->getOption('token');
 		$filter = $this->sharesList->filterStringToInt($input->getOption('filter'));
 		$recipients = $input->getOption('recipients');
+		$targetPath = $input->getOption('target-path');
 
-		$this->reportSender->sendReport(
-			$recipients,
-			$user,
-			$filter,
-			$path,
-			$token
-		);
+		$dateTime = new \DateTimeImmutable();
+
+		foreach ($recipients as $recipient) {
+			$reports = $this->reportSender->createReport(
+				$recipient,
+				$targetPath,
+				$dateTime,
+				$user,
+				$filter,
+				$path,
+				$token
+			);
+
+			$this->reportSender->sendReport($recipient, $dateTime, $reports);
+		}
 
 		return 0;
 	}
 
-	private function checkAllRequiredOptionsAreNotEmpty(InputInterface $input)
+	protected function checkAllRequiredOptionsAreNotEmpty(InputInterface $input)
     {
         $errors = [];
+
+		if (!$input->getOption('target-path')) {
+			$errors[] = 'The required option --target-path is not set or is empty.';
+		}
+
         $recipients = $this->getDefinition()->getOption('recipients');
 
         /** @var InputOption $recipient */
         foreach ([$recipients] as $recipient) {
             $name = $recipient->getName();
-            $value = $input->getOption($name);
+            $values = $input->getOption($name);
 
-            if ($value === null || $value === '' || ($recipient->isArray() && empty($value))) {
-                $errors[] = sprintf('The required option --%s is not set or is empty', $name);
+            if ($values === null || $values === '' || ($recipient->isArray() && empty($values))) {
+                $errors[] = sprintf('The required option --%s is not set or is empty.', $name);
             }
+
+			foreach ($values as $value) {
+				if (!$this->userManager->userExists($value)) {
+					$errors[] = sprintf('The recipient user %s does not exist.', $value);
+				}
+			}
         }
 
         if (count($errors)) {
