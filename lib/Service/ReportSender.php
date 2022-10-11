@@ -95,17 +95,7 @@ class ReportSender {
 
 		$template->addFooter('', $language);
 
-		if ($userId === null && $token === null) {
-			$shares = [];
-			$this->userManager->callForSeenUsers(function (IUser $user) use ($token, $path, $filter, &$shares) {
-				$tmp = $this->sharesList->getFormattedShares($user->getUID(), $filter, $path, $token);
-				foreach ($tmp as $share) {
-					$shares[] = $share;
-				}
-			});
-		} else {
-			$shares = iter\toArray($this->sharesList->getFormattedShares($userId, $filter, $path, $token));
-		}
+		$shares = iter\toArray($this->sharesList->getFormattedShares($userId, $filter, $path, $token));
 
 		$json_attachment = $this->mailer->createAttachment(
 			$this->sharesList->getSerializedShares($shares, 'json'),
