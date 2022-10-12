@@ -29,25 +29,15 @@ namespace OCA\ShareListing\Command;
 
 use OCA\ShareListing\Service\ReportSender;
 use OCA\ShareListing\Service\SharesList;
-use OCP\Files\IRootFolder;
-use OCP\IUser;
 use OCP\IUserManager;
-use OCP\Share\IManager as ShareManager;
 use OC\Core\Command\Base;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class SendShares extends Base {
-
-	/** @var ShareManager */
-	private $shareManager;
-
 	/** @var IUserManager */
 	private $userManager;
-
-	/** @var IRootFolder */
-	private $rootFolder;
 
 	/** @var ReportSender */
 	private $reportSender;
@@ -56,17 +46,13 @@ class SendShares extends Base {
 	private $sharesList;
 
 	public function __construct(
-		ShareManager $shareManager,
 		IUserManager $userManager,
-		IRootFolder $rootFolder,
 		ReportSender $reportSender,
 		SharesList $sharesList
 	) {
 		parent::__construct();
 
-		$this->shareManager = $shareManager;
 		$this->userManager = $userManager;
-		$this->rootFolder = $rootFolder;
 		$this->reportSender = $reportSender;
 		$this->sharesList = $sharesList;
 	}

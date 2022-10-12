@@ -43,6 +43,11 @@ use Psr\Log\LoggerInterface;
 class ReportSender {
 	public const ACTIVITY_LIMIT = 20;
 
+	/** @var string */
+	private $appName;
+	/** @var Iconfig */
+	private $config;
+
 	private $mailer;
 	private $userManager;
 	private $defaults;
@@ -57,6 +62,7 @@ class ReportSender {
 	protected $url;
 
 	public function __construct(
+		string $appName,
 		IConfig $config,
 		IMailer $mailer,
 		IUserManager $userManager,
@@ -67,6 +73,7 @@ class ReportSender {
 		IRootFolder $root,
 		IURLGenerator $url
 	) {
+		$this->appName = $appName;
 		$this->config = $config;
 		$this->mailer = $mailer;
 		$this->userManager = $userManager;
@@ -90,6 +97,7 @@ class ReportSender {
         $userFolder = $this->root->getUserFolder($recipient);
 
 		if ($userFolder->nodeExists($targetPath)) {
+			/** @var Folder $folder */
 			$folder = $userFolder->get($targetPath);
 			if ($folder->getType() !== FileInfo::TYPE_FOLDER) {
 				return ['error' => 'Target path ' . $targetPath . ' is not a folder'];
