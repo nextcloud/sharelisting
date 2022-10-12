@@ -30,34 +30,31 @@ namespace OCA\ShareListing\Command;
 use OCA\ShareListing\Service\ReportSender;
 use OCA\ShareListing\Service\SharesList;
 use OCP\IUserManager;
-use OC\Core\Command\Base;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class SendShares extends Base {
+class SendShares extends AbstractCommand {
 	/** @var IUserManager */
 	private $userManager;
 
 	/** @var ReportSender */
 	private $reportSender;
 
-	/** @var SharesList */
-	private $sharesList;
-
 	public function __construct(
 		IUserManager $userManager,
 		ReportSender $reportSender,
 		SharesList $sharesList
 	) {
-		parent::__construct();
+		parent::__construct($sharesList);
 
 		$this->userManager = $userManager;
 		$this->reportSender = $reportSender;
-		$this->sharesList = $sharesList;
 	}
 
 	public function configure() {
+		parent::configure();
+
 		$this->setName('sharing:send')
 			->setDescription('Send list who has access to shares by owner')
 			->addOption(
@@ -71,38 +68,13 @@ class SendShares extends Base {
 				'x',
 				InputOption::VALUE_REQUIRED,
 				'Generated reports will be stored on this path'
-			)
-			->addOption(
-				'user',
-				'u',
-				InputOption::VALUE_OPTIONAL,
-				'Will list shares of the given user'
-			)
-			->addOption(
-				'path',
-				'p',
-				InputOption::VALUE_OPTIONAL,
-				'Will only consider the given path'
-			)->addOption(
-				'token',
-				't',
-				InputOption::VALUE_OPTIONAL,
-				'Will only consider the given token'
-			)->addOption(
-				'filter',
-				'f',
-				InputOption::VALUE_OPTIONAL,
-				'Filter shares, possible values: owner, initiator, recipient, token, has-expiration, no-expiration'
 			);
 	}
 
 	protected function execute(InputInterface $input, OutputInterface $output): int {
 		$this->checkAllRequiredOptionsAreNotEmpty($input);
 
-		$user = $input->getOption('user');
-		$path = $input->getOption('path');
-		$token = $input->getOption('token');
-		$filter = $this->sharesList->filterStringToInt($input->getOption('filter'));
+		[$user, $path, $token, $filter] = $this->getOptions($input);
 		$recipients = $input->getOption('recipients');
 		$targetPath = $input->getOption('target-path');
 
