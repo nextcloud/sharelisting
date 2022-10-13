@@ -31,6 +31,7 @@ use iter;
 use OCA\ShareListing\Service\SharesList;
 use OCP\Defaults;
 use OCP\Files\FileInfo;
+use OCP\Files\Folder;
 use OCP\Files\IRootFolder;
 use OCP\IConfig;
 use OCP\IURLGenerator;
@@ -54,6 +55,8 @@ class ReportSender {
 	private $l10nFactory;
 	private $logger;
 
+	/** @var array */
+	protected $reports = [];
 	/** @var SharesList */
 	private $sharesList;
 	/** @var IRootFolder */
@@ -94,36 +97,40 @@ class ReportSender {
 		string $path = null,
 		string $token = null
 	) {
-        $userFolder = $this->root->getUserFolder($recipient);
+		$userFolder = $this->root->getUserFolder($recipient);
 
 		if ($userFolder->nodeExists($targetPath)) {
 			/** @var Folder $folder */
 			$folder = $userFolder->get($targetPath);
 			if ($folder->getType() !== FileInfo::TYPE_FOLDER) {
-				return ['error' => 'Target path ' . $targetPath . ' is not a folder'];
+				$this->logger->warning(
+					'Target path ' . $targetPath . ' is not a folder',
+					['app' => $this->appName]
+				);
 			}
 		} else {
 			$folder = $userFolder->newFolder($targetPath);
 		}
 
-		$shares = iter\toArray($this->sharesList->getFormattedShares($userId, $filter, $path, $token));
-
+		$formats = ['json', 'csv'];
 		$formatedDateTime = $dateTime->format('YmdHi');
-		$reports = [];
-		foreach (['json', 'csv'] as $format) {
-			$fileName=$formatedDateTime.' - Shares report.'.$format;
-			$savedFile = $folder->newFile($fileName);
-			$savedFile->putContent($this->sharesList->getSerializedShares($shares, $format));
-			$reports[] = [
-				'name' => $savedFile->getName(),
-				'url' => $this->url->linkToRouteAbsolute('files.viewcontroller.showFile', ['fileid' => $savedFile->getId()])
-			];
+		foreach ($formats as $key => $format) {
+			$fileName = $formatedDateTime . ' - Shares report.' . $format;
+			if (!array_key_exists($fileName, $this->reports)) {
+				if ($key === array_key_first($formats)) {
+					$shares = iter\toArray($this->sharesList->getFormattedShares($userId, $filter, $path, $token));
+				}
+				$reportFile = $folder->newFile($fileName);
+				$reportFile->putContent($this->sharesList->getSerializedShares($shares, $format));
+				$this->reports[$reportFile->getName()] = $this->url->linkToRouteAbsolute(
+					'files.View.showFile',
+					['fileid' => $reportFile->getId()]
+				);
+			}
 		}
-
-		return $reports;
 	}
 
-	public function sendReport(string $recipient, \DateTimeImmutable $dateTime, array $reports) {
+	public function sendReport(string $recipient, \DateTimeImmutable $dateTime) {
 		$defaultLanguage = $this->config->getSystemValue('default_language', 'en');
 		$userLanguages = $this->config->getUserValue($recipient, 'core', 'lang');
 		$language = (!empty($userLanguages)) ? $userLanguages : $defaultLanguage;
@@ -139,12 +146,13 @@ class ReportSender {
 		$template->addHeader();
 		$template->addBodyText('You can find the list of shares reports generated on ' . $formatedDateTime . ':');
 
-		foreach ($reports as $report) {
+		foreach ($this->reports as $name => $url) {
 			$template->addBodyListItem(
-				'<a href="'.$report['url'].'">'.$report['name'].'</a>',
+				'<a href="' . $url . '">' . $name . '</a>',
 				'',
 				'',
-				$report['name'].': '.$report['url']);
+				$name . ': ' . $url
+			);
 		}
 
 		$template->addFooter('', $language);

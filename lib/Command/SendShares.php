@@ -81,7 +81,7 @@ class SendShares extends AbstractCommand {
 		$dateTime = new \DateTimeImmutable();
 
 		foreach ($recipients as $recipient) {
-			$reports = $this->reportSender->createReport(
+			$this->reportSender->createReport(
 				$recipient,
 				$targetPath,
 				$dateTime,
@@ -91,7 +91,7 @@ class SendShares extends AbstractCommand {
 				$token
 			);
 
-			$this->reportSender->sendReport($recipient, $dateTime, $reports);
+			$this->reportSender->sendReport($recipient, $dateTime);
 		}
 
 		return 0;
