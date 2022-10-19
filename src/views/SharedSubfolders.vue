@@ -25,11 +25,13 @@
 		<!-- Main collapsible entry -->
 		<SharedEntrySimple :title="mainTitle" :subtitle="subTitle">
 			<template #avatar>
-				<div class="avatar-subfolder avatar-subfolder--primary icon-folder-shared-white" />
+				<div class="avatar-subfolder avatar-subfolder--primary">
+					<svg xmlns="http://www.w3.org/2000/svg" height="22" viewBox="0 0 16 16" width="22" version="1.1"><path fill="white" d="m1.5 2c-0.25 0-0.5 0.25-0.5 0.5v11c0 0.26 0.24 0.5 0.5 0.5h13c0.26 0 0.5-0.241 0.5-0.5v-9c0-0.25-0.25-0.5-0.5-0.5h-6.5l-2-2h-4.5zm8.75 3.5a1.25 1.25 0 0 1 1.25 1.25 1.25 1.25 0 0 1 -1.25 1.25 1.25 1.25 0 0 1 -0.8008 -0.291l-2.4512 1.2265a1.25 1.25 0 0 1 0.002 0.0645 1.25 1.25 0 0 1 -0.0039 0.0645l2.4531 1.2265a1.25 1.25 0 0 1 0.8008 -0.291 1.25 1.25 0 0 1 1.25 1.25 1.25 1.25 0 0 1 -1.25 1.25 1.25 1.25 0 0 1 -1.25 -1.25 1.25 1.25 0 0 1 0.0039 -0.064l-2.4531-1.227a1.25 1.25 0 0 1 -0.8008 0.291 1.25 1.25 0 0 1 -1.25 -1.25 1.25 1.25 0 0 1 1.25 -1.25 1.25 1.25 0 0 1 0.8008 0.291l2.4512-1.2265a1.25 1.25 0 0 1 -0.002 -0.0645 1.25 1.25 0 0 1 1.25 -1.25z"/></svg>
+				</div>
 			</template>
-			<ActionButton :icon="showSubfoldersIcon" @click.prevent.stop="toggleSubfolders">
+			<NcActionButton :icon="showSubfoldersIcon" @click.prevent.stop="toggleSubfolders">
 				{{ t('sharelisting', 'Toggle subfolders listing') }}
-			</ActionButton>
+			</NcActionButton>
 		</SharedEntrySimple>
 
 		<!-- Shared subfolders list -->
@@ -41,9 +43,9 @@
 			<template #avatar>
 				<div :class="[share.is_directory ? 'icon-folder' : 'icon-file']" class="avatar-subfolder" />
 			</template>
-			<ActionLink icon="icon-confirm" :href="generateFileUrl(share.path, share.file_id)">
+			<NcActionLink icon="icon-confirm" :href="generateFileUrl(share.path, share.file_id)">
 				{{ share.path }}
-			</ActionLink>
+			</NcActionLink>
 		</SharedEntrySimple>
 	</div>
 </template>
@@ -51,16 +53,16 @@
 <script>
 import axios from '@nextcloud/axios'
 import { generateUrl, generateOcsUrl } from '@nextcloud/router'
-import ActionButton from '@nextcloud/vue/dist/Components/ActionButton'
-import ActionLink from '@nextcloud/vue/dist/Components/ActionLink'
-import SharedEntrySimple from '../components/SharingEntrySimple'
+import NcActionButton from '@nextcloud/vue/dist/Components/NcActionButton.js'
+import NcActionLink from '@nextcloud/vue/dist/Components/NcActionLink.js'
+import SharedEntrySimple from '../components/SharingEntrySimple.vue'
 
 export default {
 	name: 'SharedSubfolders',
 
 	components: {
-		ActionButton,
-		ActionLink,
+		NcActionButton,
+		NcActionLink,
 		SharedEntrySimple,
 	},
 
@@ -173,6 +175,7 @@ export default {
 		font-size: 18px;
 		border-radius: 50%;
 		flex-shrink: 0;
+		padding: 4px;
 		&--primary {
 			background-color: var(--color-primary-element);
 		}

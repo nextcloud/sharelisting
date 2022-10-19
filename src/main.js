@@ -25,6 +25,11 @@ import { translate, translatePlural } from '@nextcloud/l10n'
 Vue.prototype.t = translate
 Vue.prototype.n = translatePlural
 
+// eslint-disable-next-line
+__webpack_nonce__ = btoa(OC.requestToken)
+// eslint-disable-next-line
+__webpack_public_path__ = OC.linkTo('sharelisting', 'js/')
+
 window.addEventListener('DOMContentLoaded', () => {
 	if (!OCA?.Sharing?.ShareTabSections) {
 		return
