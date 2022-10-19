@@ -58,6 +58,12 @@ class SendShares extends AbstractCommand {
 		$this->setName('sharing:send')
 			->setDescription('Send list who has access to shares by owner')
 			->addOption(
+				'diff',
+				'd',
+				InputOption::VALUE_NONE,
+				'Create a differential report in json format from the last available report'
+			)
+			->addOption(
 				'recipients',
 				'r',
 				InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
@@ -75,6 +81,7 @@ class SendShares extends AbstractCommand {
 		$this->checkAllRequiredOptionsAreNotEmpty($input);
 
 		[$user, $path, $token, $filter] = $this->getOptions($input);
+		$diff = $input->getOption('diff');
 		$recipients = $input->getOption('recipients');
 		$targetPath = $input->getOption('target-path');
 
@@ -91,9 +98,12 @@ class SendShares extends AbstractCommand {
 				$token
 			);
 
+			if ($diff) {
+				$this->reportSender->diff($recipient, $targetPath);
+			}
+
 			$this->reportSender->sendReport($recipient, $dateTime);
 		}
-
 		return 0;
 	}
 

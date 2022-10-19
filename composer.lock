@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "280059a3e5c545fce72e8e3f92894660",
+    "content-hash": "2e26a4680f38483a82654971170dc65d",
     "packages": [
         {
             "name": "nikic/iter",
@@ -55,6 +55,49 @@
                 "source": "https://github.com/nikic/iter/tree/v2.2.0"
             },
             "time": "2021-08-02T15:04:32+00:00"
+        },
+        {
+            "name": "swaggest/json-diff",
+            "version": "v3.9.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/swaggest/json-diff.git",
+                "reference": "ff3a7921e9f1aa096067eb541fcfd0e7611c558c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/swaggest/json-diff/zipball/ff3a7921e9f1aa096067eb541fcfd0e7611c558c",
+                "reference": "ff3a7921e9f1aa096067eb541fcfd0e7611c558c",
+                "shasum": ""
+            },
+            "require": {
+                "ext-json": "*"
+            },
+            "require-dev": {
+                "phperf/phpunit": "4.8.37"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Swaggest\\JsonDiff\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Viacheslav Poturaev",
+                    "email": "vearutop@gmail.com"
+                }
+            ],
+            "description": "JSON diff/rearrange/patch/pointer library for PHP",
+            "support": {
+                "issues": "https://github.com/swaggest/json-diff/issues",
+                "source": "https://github.com/swaggest/json-diff/tree/v3.9.0"
+            },
+            "time": "2022-08-29T15:04:08+00:00"
         },
         {
             "name": "symfony/deprecation-contracts",

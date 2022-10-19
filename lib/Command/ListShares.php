@@ -43,13 +43,6 @@ class ListShares extends AbstractCommand {
 				InputOption::VALUE_OPTIONAL,
 				'Output format (json or csv, default is json)',
 				'json'
-			)	
-			->addOption(
-				'output',
-				'o',
-				InputOption::VALUE_OPTIONAL,
-				'Output format (json or csv, default is json)',
-				'json'
 			);
 	}
 	
