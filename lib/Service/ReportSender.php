@@ -27,7 +27,6 @@ declare(strict_types=1);
 
 namespace OCA\ShareListing\Service;
 
-use Icewind\SMB\Exception\NotFoundException;
 use iter;
 use OC\Files\Search\SearchBinaryOperator;
 use OC\Files\Search\SearchComparison;
@@ -39,6 +38,7 @@ use OCP\Files\FileInfo;
 use OCP\Files\Folder;
 use OCP\Files\InvalidDirectoryException;
 use OCP\Files\IRootFolder;
+use OCP\Files\NotFoundException;
 use OCP\Files\Search\ISearchBinaryOperator;
 use OCP\Files\Search\ISearchComparison;
 use OCP\Files\Search\ISearchOrder;
@@ -181,6 +181,14 @@ class ReportSender
 				$this->diffReport['fileName'] . ': ' . $this->diffReport['url']
 			);
 		}
+
+		$template->addBodyText('Permissions mapping:');
+		$template->addBodyListItem('1 = read');
+		$template->addBodyListItem('2 = update');
+		$template->addBodyListItem('4 = create');
+		$template->addBodyListItem('8 = delete');
+		$template->addBodyListItem('16 = share');
+		$template->addBodyListItem('31 = all (default: 31, for public shares: 1)');
 
 		$template->addFooter('', $language);
 
