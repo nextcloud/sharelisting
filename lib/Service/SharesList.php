@@ -208,7 +208,7 @@ class SharesList {
 		return $shares;
 	}
 
-	public function getFormattedShares(?string $userId = '', int $filter = self::FILTER_NONE, string $path = null, string $token = null): \Iterator {
+	public function getFormattedShares(string $userId = null, int $filter = self::FILTER_NONE, string $path = null, string $token = null): \Iterator {
 		$shares = $this->get($userId, $filter, $path, $token);
 
 		$formattedShares = iter\map(function (IShare $share): array {
