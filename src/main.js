@@ -35,6 +35,7 @@ window.addEventListener('DOMContentLoaded', () => {
 		return
 	}
 
+	// eslint-disable-next-line
 	import(/* webpackChunkName: "sharing" */'./views/SharedSubfolders').then((Module) => {
 		OCA.Sharing.ShareTabSections.registerSection((el, fileInfo) => {
 			if (fileInfo.isDirectory() !== true) {
