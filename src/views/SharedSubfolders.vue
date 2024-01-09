@@ -25,9 +25,7 @@
 		<!-- Main collapsible entry -->
 		<SharedEntrySimple :title="mainTitle" :subtitle="subTitle">
 			<template #avatar>
-				<div class="avatar-subfolder avatar-subfolder--primary">
-					<svg xmlns="http://www.w3.org/2000/svg" height="22" viewBox="0 0 16 16" width="22" version="1.1"><path fill="white" d="m1.5 2c-0.25 0-0.5 0.25-0.5 0.5v11c0 0.26 0.24 0.5 0.5 0.5h13c0.26 0 0.5-0.241 0.5-0.5v-9c0-0.25-0.25-0.5-0.5-0.5h-6.5l-2-2h-4.5zm8.75 3.5a1.25 1.25 0 0 1 1.25 1.25 1.25 1.25 0 0 1 -1.25 1.25 1.25 1.25 0 0 1 -0.8008 -0.291l-2.4512 1.2265a1.25 1.25 0 0 1 0.002 0.0645 1.25 1.25 0 0 1 -0.0039 0.0645l2.4531 1.2265a1.25 1.25 0 0 1 0.8008 -0.291 1.25 1.25 0 0 1 1.25 1.25 1.25 1.25 0 0 1 -1.25 1.25 1.25 1.25 0 0 1 -1.25 -1.25 1.25 1.25 0 0 1 0.0039 -0.064l-2.4531-1.227a1.25 1.25 0 0 1 -0.8008 0.291 1.25 1.25 0 0 1 -1.25 -1.25 1.25 1.25 0 0 1 1.25 -1.25 1.25 1.25 0 0 1 0.8008 0.291l2.4512-1.2265a1.25 1.25 0 0 1 -0.002 -0.0645 1.25 1.25 0 0 1 1.25 -1.25z"/></svg>
-				</div>
+				<div class="avatar-subfolder avatar-subfolder--primary" />
 			</template>
 			<NcActionButton :icon="showSubfoldersIcon" @click.prevent.stop="toggleSubfolders">
 				{{ t('sharelisting', 'Toggle subfolders listing') }}
@@ -168,6 +166,7 @@ export default {
 
 <style lang="scss" scoped>
 .sharing-entry__subfolders {
+	padding: 0 6px;
 	.avatar-subfolder {
 		width: 32px;
 		height: 32px;
@@ -178,6 +177,9 @@ export default {
 		padding: 4px;
 		&--primary {
 			background-color: var(--color-primary-element);
+			background-image: url('../assets/share-folder.svg');
+			background-position: center;
+			background-repeat: no-repeat;
 		}
 	}
 
