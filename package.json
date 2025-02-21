@@ -14,10 +14,10 @@
     "stylelint:fix": "stylelint src --fix"
   },
   "dependencies": {
-    "@nextcloud/axios": "^2.5.0",
+    "@nextcloud/axios": "^2.5.1",
     "@nextcloud/l10n": "^2.1.0",
     "@nextcloud/router": "^2.2.1",
-    "@nextcloud/vue": "^7.12.2",
+    "@nextcloud/vue": "^8.23.1",
     "vue": "^2.7.14"
   },
   "devDependencies": {
@@ -25,8 +25,8 @@
     "@nextcloud/browserslist-config": "^2.3.0",
     "@nextcloud/eslint-config": "^8.4.1",
     "@nextcloud/stylelint-config": "^2.4.0",
-    "@nextcloud/webpack-vue-config": "^6.0.1",
-    "@relative-ci/agent": "^4.2.9",
+    "@nextcloud/webpack-vue-config": "^6.2.0",
+    "@relative-ci/agent": "^4.2.14",
     "vue-template-compiler": "^2.7.16"
   },
   "browserslist": [
