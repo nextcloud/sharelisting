@@ -5,6 +5,7 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
+use Nextcloud\Rector\Set\NextcloudSets;
 use Rector\Config\RectorConfig;
 use Rector\DeadCode\Rector\StaticCall\RemoveParentCallWithoutParentRector;
 use Rector\Set\ValueObject\SetList;
@@ -24,6 +25,7 @@ return function (RectorConfig $rectorConfig) {
 		SetList::PHP_74,
 		SetList::PHP_80,
 		SetList::PHP_81,
+		NextcloudSets::NEXTCLOUD_30,
 	]);
 	$rectorConfig->rule(ReturnTypeFromStrictTypedPropertyRector::class);
 	$rectorConfig->rule(ReturnUnionTypeRector::class);

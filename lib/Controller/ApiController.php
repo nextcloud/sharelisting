@@ -30,7 +30,6 @@ use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\OCS\OCSNotFoundException;
 use OCP\AppFramework\OCSController;
 use OCP\IRequest;
-use OCP\IUserManager;
 use OCP\IUserSession;
 use OCP\Share\IShare;
 use function iter\filter;
@@ -38,31 +37,13 @@ use function iter\map;
 use function iter\toArray;
 
 class ApiController extends OCSController {
-
-	/** @var IUserSession */
-	protected $userSession;
-
-	/** @var SharesList */
-	protected $sharesList;
-
-	/**
-	 * @param string $appName
-	 * @param IRequest $request
-	 * @param IUserSession $userSession
-	 * @param IUserManager $userManager
-	 * @param SharesList $sharesList
-	 */
 	public function __construct(
 		string $appName,
 		IRequest $request,
-		IUserSession $userSession,
-		private IUserManager $userManager,
-		SharesList $sharesList,
+		private IUserSession $userSession,
+		private SharesList $sharesList,
 	) {
 		parent::__construct($appName, $request);
-
-		$this->userSession = $userSession;
-		$this->sharesList = $sharesList;
 	}
 
 	/**
@@ -71,7 +52,6 @@ class ApiController extends OCSController {
 	 * Get shared sub folders of a fiven path
 	 *
 	 * @param string $path path of the current folder
-	 * @return DataResponse
 	 */
 	public function getSharedSubfolders(string $path): DataResponse {
 		$currentUser = $this->userSession->getUser();
