@@ -10,9 +10,9 @@
 	<author>Roeland Jago Douma</author>
 	<namespace>ShareListing</namespace>
 	<category>tools</category>
-	<bugs>https://github.com/rullzer/sharelisting/issues</bugs>
+	<bugs>https://github.com/nextcloud/sharelisting/issues</bugs>
 	<dependencies>
-		<nextcloud min-version="26" max-version="29" />
+		<nextcloud min-version="30" max-version="32" />
 	</dependencies>
 
 	<commands>
