@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 /**
  * @copyright Copyright (c) 2018 Roeland Jago Douma <roeland@famdouma.nl>
@@ -35,19 +36,19 @@ use OCP\IUserManager;
 use OCP\Share;
 use OCP\Share\IManager as ShareManager;
 use OCP\Share\IShare;
-use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Encoder\CsvEncoder;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Serializer;
 
 class SharesList {
 
-	const FILTER_NONE = 0;
-	const FILTER_OWNER = 1;
-	const FILTER_INITIATOR = 2;
-	const FILTER_RECIPIENT = 3;
-	const FILTER_TOKEN = 4;
-	const FILTER_HAS_EXPIRATION = 5;
-	const FILTER_NO_EXPIRATION = 6;
+	public const FILTER_NONE = 0;
+	public const FILTER_OWNER = 1;
+	public const FILTER_INITIATOR = 2;
+	public const FILTER_RECIPIENT = 3;
+	public const FILTER_TOKEN = 4;
+	public const FILTER_HAS_EXPIRATION = 5;
+	public const FILTER_NO_EXPIRATION = 6;
 
 	/** @var ShareManager */
 	private $shareManager;
@@ -59,8 +60,8 @@ class SharesList {
 	private $rootFolder;
 
 	public function __construct(ShareManager $shareManager,
-								IUserManager $userManager,
-								IRootFolder $rootFolder) {
+		IUserManager $userManager,
+		IRootFolder $rootFolder) {
 		$this->shareManager = $shareManager;
 		$this->userManager = $userManager;
 		$this->rootFolder = $rootFolder;
@@ -76,7 +77,7 @@ class SharesList {
 		];
 	}
 
-	public function get(?string $userId, int $filter, string $path = null, string $token = null): \Iterator {
+	public function get(?string $userId, int $filter, ?string $path = null, ?string $token = null): \Iterator {
 		$shares = $this->getShares($userId);
 
 		// If path is set. Filter for the current user
@@ -208,7 +209,7 @@ class SharesList {
 		return $shares;
 	}
 
-	public function getFormattedShares(string $userId = null, int $filter = self::FILTER_NONE, string $path = null, string $token = null): \Iterator {
+	public function getFormattedShares(?string $userId = null, int $filter = self::FILTER_NONE, ?string $path = null, ?string $token = null): \Iterator {
 		$shares = $this->get($userId, $filter, $path, $token);
 
 		$formattedShares = iter\map(function (IShare $share): array {
@@ -316,8 +317,7 @@ class SharesList {
 		return $filter;
 	}
 
-	public function getSerializedShares(array $shares, ?string $format = 'json'): string
-	{
+	public function getSerializedShares(array $shares, ?string $format = 'json'): string {
 		switch ($format) {
 			case 'csv':
 				$encoders = [new CsvEncoder()];
