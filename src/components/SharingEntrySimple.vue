@@ -74,18 +74,21 @@ export default {
 .sharing-entry {
 	display: flex;
 	align-items: center;
-	height: 44px;
+
 	&__desc {
 		padding: 8px;
 		line-height: 1.2em;
 		position: relative;
 		flex: 1 1;
 		min-width: 0;
+
 		h5 {
+			font-size: 16px;
 			white-space: nowrap;
 			text-overflow: ellipsis;
 			overflow: hidden;
 			max-width: inherit;
+			margin-block: 0;
 		}
 		p {
 			color: var(--color-text-maxcontrast);
