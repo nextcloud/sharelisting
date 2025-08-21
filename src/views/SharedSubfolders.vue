@@ -21,46 +21,67 @@
   -->
 
 <template>
-	<div class="sharing-entry__subfolders">
-		<!-- Main collapsible entry -->
-		<SharedEntrySimple :title="mainTitle" :subtitle="subTitle">
-			<template #avatar>
-				<div class="avatar-subfolder avatar-subfolder--primary" />
-			</template>
-			<NcActionButton :icon="showSubfoldersIcon" @click.prevent.stop="toggleSubfolders">
-				{{ t('sharelisting', 'Toggle subfolders listing') }}
-			</NcActionButton>
-		</SharedEntrySimple>
+	<section>
+		<div class="section-header">
+			<h4>{{ t('sharelisting', 'Shared subitems') }}</h4>
+			<NcPopover popup-role="dialog">
+				<template #trigger>
+					<NcButton class="hint-icon"
+						type="tertiary-no-background"
+						:aria-label="t('sharelisting', 'Shared subitems explanation')">
+						<template #icon>
+							<InfoIcon :size="20" />
+						</template>
+					</NcButton>
+				</template>
+				<p class="hint-body">
+					{{ t('sharelisting', 'Any other shares from subfolders') }}
+				</p>
+			</NcPopover>
+		</div>
+
+		<NcButton v-if="!showSubfolders" @click="loadSubfolders()">
+			{{ t('sharelisting', 'Load') }}
+		</NcButton>
+
+		<div v-if="showSubfolders && shares.length === 0">
+			{{ loading ? t('sharelisting', 'Loading …') : t('sharelisting', 'No shared subfolders found') }}
+		</div>
 
 		<!-- Shared subfolders list -->
 		<SharedEntrySimple v-for="share in shares"
 			:key="share.id"
-			class="sharing-entry__subfolder"
 			:title="share.name"
 			:subtitle="t('sharelisting', 'Shared by {initiator}', { initiator: share.initiator })">
 			<template #avatar>
-				<div :class="[share.is_directory ? 'icon-folder' : 'icon-file']" class="avatar-subfolder" />
+				<div :class="[share.is_directory ? 'icon-folder' : 'icon-file']"
+					class="avatar-subfolder" />
 			</template>
-			<NcActionLink icon="icon-confirm" :href="generateFileUrl(share.path, share.file_id)">
+			<NcActionLink icon="icon-confirm"
+				:href="generateFileUrl(share.path, share.file_id)">
 				{{ share.path }}
 			</NcActionLink>
 		</SharedEntrySimple>
-	</div>
+	</section>
 </template>
 
 <script>
 import axios from '@nextcloud/axios'
 import { generateUrl, generateOcsUrl } from '@nextcloud/router'
-import NcActionButton from '@nextcloud/vue/dist/Components/NcActionButton.js'
-import NcActionLink from '@nextcloud/vue/dist/Components/NcActionLink.js'
+import NcButton from '@nextcloud/vue/components/NcButton'
+import NcActionLink from '@nextcloud/vue/components/NcActionLink'
+import NcPopover from '@nextcloud/vue/components/NcPopover'
 import SharedEntrySimple from '../components/SharingEntrySimple.vue'
+import InfoIcon from 'vue-material-design-icons/InformationOutline.vue'
 
 export default {
 	name: 'SharedSubfolders',
 
 	components: {
-		NcActionButton,
+		NcButton,
 		NcActionLink,
+		NcPopover,
+		InfoIcon,
 		SharedEntrySimple,
 	},
 
@@ -73,31 +94,14 @@ export default {
 
 	data() {
 		return {
-			loaded: false,
 			loading: false,
+			loaded: false,
 			showSubfolders: false,
 			shares: [],
 		}
 	},
 
 	computed: {
-		showSubfoldersIcon() {
-			if (this.loading) {
-				return 'icon-loading-small'
-			}
-			if (this.showSubfolders) {
-				return 'icon-triangle-n'
-			}
-			return 'icon-triangle-s'
-		},
-		mainTitle() {
-			return t('sharelisting', 'Shared subitems')
-		},
-		subTitle() {
-			return (this.showSubfolders && this.shares.length === 0)
-				? t('sharelisting', 'No shared subfolders found')
-				: ''
-		},
 		fullPath() {
 			const path = `${this.fileInfo.path}/${this.fileInfo.name}`
 			return path.replace('//', '/')
@@ -114,13 +118,9 @@ export default {
 		/**
 		 * Toggle the list view and fetch/reset the state
 		 */
-		toggleSubfolders() {
-			this.showSubfolders = !this.showSubfolders
-			if (this.showSubfolders) {
-				this.fetchSharedSubfolders()
-			} else {
-				this.resetState()
-			}
+		loadSubfolders() {
+			this.showSubfolders = true
+			this.fetchSharedSubfolders()
 		},
 
 		/**
@@ -145,7 +145,6 @@ export default {
 		 */
 		resetState() {
 			this.loaded = false
-			this.loading = false
 			this.showSubfolders = false
 			this.shares = []
 		},
@@ -158,33 +157,44 @@ export default {
 		 * @return {string}
 		 */
 		generateFileUrl(dir, fileid) {
-			return generateUrl('/apps/files?dir={dir}&fileid={fileid}', { dir, fileid })
+			return generateUrl('/apps/files?dir={dir}&fileid={fileid}', {
+				dir,
+				fileid,
+			})
 		},
 	},
 }
 </script>
 
 <style lang="scss" scoped>
-.sharing-entry__subfolders {
-	padding: 0 6px;
-	.avatar-subfolder {
-		width: 32px;
-		height: 32px;
-		line-height: 32px;
-		font-size: 18px;
-		border-radius: 50%;
-		flex-shrink: 0;
-		padding: 4px;
-		&--primary {
-			background-color: var(--color-primary-element);
-			background-image: url('../assets/share-folder.svg');
-			background-position: center;
-			background-repeat: no-repeat;
+section {
+	padding-bottom: 16px;
+	border-top: 2px solid var(--color-border);
+
+	.section-header {
+		margin-top: 6px;
+		margin-bottom: 2px;
+		display: flex;
+		align-items: center;
+		padding-bottom: 4px;
+
+		h4 {
+			margin: 0;
+			font-size: 16px;
+		}
+
+		.visually-hidden {
+			display: none;
+		}
+
+		.hint-icon {
+			color: var(--color-primary-element);
 		}
 	}
+}
 
-	.sharing-entry__subfolder {
-		padding-left: 36px;
-	}
+.hint-body {
+	max-width: 300px;
+	padding: var(--border-radius-element);
 }
 </style>
