@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 /**
  * @copyright Copyright (c) 2018 Roeland Jago Douma <roeland@famdouma.nl>
@@ -31,13 +32,12 @@ use OCP\AppFramework\App;
 use OCP\AppFramework\Bootstrap\IBootContext;
 use OCP\AppFramework\Bootstrap\IBootstrap;
 use OCP\AppFramework\Bootstrap\IRegistrationContext;
-use OCP\EventDispatcher\IEventDispatcher;
 
 include_once __DIR__ . '/../../vendor/autoload.php';
 
 class Application extends App implements IBootstrap {
 
-	const appID = 'sharelisting';
+	public const appID = 'sharelisting';
 
 	public function __construct() {
 		parent::__construct(self::appID);

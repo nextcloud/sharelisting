@@ -6,6 +6,9 @@
 		xmlns="https://getpsalm.org/schema/config"
 		xsi:schemaLocation="https://getpsalm.org/schema/config vendor/vimeo/psalm/config.xsd"
 		errorBaseline="tests/psalm-baseline.xml"
+		phpVersion="8.1"
+		findUnusedCode="false"
+		ensureOverrideAttribute="false"
 >
 	<stubs>
 		<file name="tests/stub.phpstub" preloadClasses="true"/>
@@ -18,11 +21,5 @@
 	</projectFiles>
 	<extraFiles>
 		<directory name="vendor" />
-		<ignoreFiles>
-			<directory name="vendor/phpunit/php-code-coverage" />
-			<directory name="vendor/psalm" />
-		</ignoreFiles>
 	</extraFiles>
-	<issueHandlers>
-	</issueHandlers>
 </psalm>

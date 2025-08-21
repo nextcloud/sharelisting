@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 /**
  * @copyright Copyright (c) 2019 John Molakvoæ <skjnldsv@protonmail.com>
@@ -26,8 +27,8 @@ return [
 	'ocs' => [
 		[
 			'name' => 'Api#getSharedSubfolders',
-			'url'  => '/api/v1/sharedSubfolders',
+			'url' => '/api/v1/sharedSubfolders',
 			'verb' => 'GET'
-        ]
+		]
 	]
 ];

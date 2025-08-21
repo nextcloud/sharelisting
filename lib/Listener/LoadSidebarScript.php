@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 /**
  * @copyright Copyright (c) 2019, John Molakvoæ <skjnldsv@protonmail.com>
@@ -24,12 +25,15 @@ declare(strict_types=1);
 
 namespace OCA\ShareListing\Listener;
 
-use OCA\ShareListing\AppInfo\Application;
 use OCA\Files\Event\LoadSidebar;
+use OCA\ShareListing\AppInfo\Application;
 use OCP\EventDispatcher\Event;
 use OCP\EventDispatcher\IEventListener;
 use OCP\Util;
 
+/**
+ * @template-implements IEventListener<LoadSidebar>
+ */
 class LoadSidebarScript implements IEventListener {
 	public function handle(Event $event): void {
 		if (!($event instanceof LoadSidebar)) {

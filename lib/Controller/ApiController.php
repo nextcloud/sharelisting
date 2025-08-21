@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 /**
  * @copyright Copyright (c) 2019 John Molakvoæ <skjnldsv@protonmail.com>
@@ -27,13 +28,11 @@ namespace OCA\ShareListing\Controller;
 use iter;
 use OCA\ShareListing\Service\SharesList;
 use OCP\AppFramework\Http\DataResponse;
-use OCP\AppFramework\OCS\OCSException;
 use OCP\AppFramework\OCS\OCSNotFoundException;
 use OCP\AppFramework\OCSController;
 use OCP\IRequest;
 use OCP\IUserManager;
 use OCP\IUserSession;
-use OCP\Share;
 use OCP\Share\IShare;
 
 class ApiController extends OCSController {
@@ -55,10 +54,10 @@ class ApiController extends OCSController {
 	 * @param SharesList $sharesList
 	 */
 	public function __construct(string $appName,
-								IRequest $request,
-								IUserSession $userSession,
-								IUserManager $userManager,
-								SharesList $sharesList) {
+		IRequest $request,
+		IUserSession $userSession,
+		IUserManager $userManager,
+		SharesList $sharesList) {
 		parent::__construct($appName, $request);
 
 		$this->userSession = $userSession;
@@ -90,13 +89,13 @@ class ApiController extends OCSController {
 		}, $shares);
 
 		// remove current folder
-		$filteredShares = iter\filter(function($share) use ($path) {
+		$filteredShares = iter\filter(function ($share) use ($path) {
 			return $share['path'] !== $path;
 		}, $formattedShares);
 
 		// sort directories first
 		$sortedShares = iter\toArray($filteredShares);
-		usort($sortedShares, function($a, $b) {
+		usort($sortedShares, function ($a, $b) {
 			if ($a['is_directory'] && $b['is_directory']) {
 				return strcmp($a['path'], $b['path']);
 			}

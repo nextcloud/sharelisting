@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 /**
  * @copyright Copyright (c) 2018 Roeland Jago Douma <roeland@famdouma.nl>
@@ -27,13 +28,11 @@ declare(strict_types=1);
 namespace OCA\ShareListing\Command;
 
 use iter;
+use OC\Core\Command\Base;
 use OCA\ShareListing\Service\SharesList;
 use OCP\Files\IRootFolder;
-use OCP\IUser;
 use OCP\IUserManager;
 use OCP\Share\IManager as ShareManager;
-use OC\Core\Command\Base;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -53,9 +52,9 @@ class ListShares extends Base {
 	private $sharesList;
 
 	public function __construct(ShareManager $shareManager,
-								IUserManager $userManager,
-								IRootFolder $rootFolder,
-								SharesList $sharesList) {
+		IUserManager $userManager,
+		IRootFolder $rootFolder,
+		SharesList $sharesList) {
 		parent::__construct();
 
 		$this->shareManager = $shareManager;
