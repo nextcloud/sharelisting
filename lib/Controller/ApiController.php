@@ -25,7 +25,6 @@ declare(strict_types=1);
 
 namespace OCA\ShareListing\Controller;
 
-use iter;
 use OCA\ShareListing\Service\SharesList;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\OCS\OCSNotFoundException;
@@ -34,14 +33,14 @@ use OCP\IRequest;
 use OCP\IUserManager;
 use OCP\IUserSession;
 use OCP\Share\IShare;
+use function iter\filter;
+use function iter\map;
+use function iter\toArray;
 
 class ApiController extends OCSController {
 
 	/** @var IUserSession */
 	protected $userSession;
-
-	/** @var IUserManager */
-	private $userManager;
 
 	/** @var SharesList */
 	protected $sharesList;
@@ -53,15 +52,16 @@ class ApiController extends OCSController {
 	 * @param IUserManager $userManager
 	 * @param SharesList $sharesList
 	 */
-	public function __construct(string $appName,
+	public function __construct(
+		string $appName,
 		IRequest $request,
 		IUserSession $userSession,
-		IUserManager $userManager,
-		SharesList $sharesList) {
+		private IUserManager $userManager,
+		SharesList $sharesList,
+	) {
 		parent::__construct($appName, $request);
 
 		$this->userSession = $userSession;
-		$this->userManager = $userManager;
 		$this->sharesList = $sharesList;
 	}
 
@@ -84,17 +84,13 @@ class ApiController extends OCSController {
 		$shares = $this->sharesList->getSub($currentUser->getUID(), SharesList::FILTER_NONE, $path);
 
 		// format results
-		$formattedShares = iter\map(function (IShare $share) {
-			return $this->sharesList->formatShare($share);
-		}, $shares);
+		$formattedShares = map(fn (IShare $share) => $this->sharesList->formatShare($share), $shares);
 
 		// remove current folder
-		$filteredShares = iter\filter(function ($share) use ($path) {
-			return $share['path'] !== $path;
-		}, $formattedShares);
+		$filteredShares = filter(fn ($share) => $share['path'] !== $path, $formattedShares);
 
 		// sort directories first
-		$sortedShares = iter\toArray($filteredShares);
+		$sortedShares = toArray($filteredShares);
 		usort($sortedShares, function ($a, $b) {
 			if ($a['is_directory'] && $b['is_directory']) {
 				return strcmp($a['path'], $b['path']);
