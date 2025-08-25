@@ -27,7 +27,6 @@ declare(strict_types=1);
 
 namespace OCA\ShareListing\Command;
 
-use iter;
 use OC\Core\Command\Base;
 use OCA\ShareListing\Service\SharesList;
 use OCP\Files\IRootFolder;
@@ -36,31 +35,17 @@ use OCP\Share\IManager as ShareManager;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use function iter\toArray;
 
 class ListShares extends Base {
 
-	/** @var ShareManager */
-	private $shareManager;
-
-	/** @var IUserManager */
-	private $userManager;
-
-	/** @var IRootFolder */
-	private $rootFolder;
-
-	/** @var SharesList */
-	private $sharesList;
-
-	public function __construct(ShareManager $shareManager,
-		IUserManager $userManager,
-		IRootFolder $rootFolder,
-		SharesList $sharesList) {
+	public function __construct(
+		private ShareManager $shareManager,
+		private IUserManager $userManager,
+		private IRootFolder $rootFolder,
+		private SharesList $sharesList,
+	) {
 		parent::__construct();
-
-		$this->shareManager = $shareManager;
-		$this->userManager = $userManager;
-		$this->rootFolder = $rootFolder;
-		$this->sharesList = $sharesList;
 
 	}
 
@@ -105,7 +90,7 @@ class ListShares extends Base {
 		$filter = $this->sharesList->filterStringToInt($input->getOption('filter'));
 		$outputOpt = $input->getOption('output');
 
-		$shares = iter\toArray($this->sharesList->getFormattedShares($user, $filter, $path, $token));
+		$shares = toArray($this->sharesList->getFormattedShares($user, $filter, $path, $token));
 
 		$output->writeln($this->sharesList->getSerializedShares($shares, $outputOpt));
 		return 0;

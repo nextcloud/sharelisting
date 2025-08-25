@@ -27,7 +27,8 @@ declare(strict_types=1);
 
 namespace OCA\ShareListing\Service;
 
-use iter;
+use EmptyIterator;
+use Iterator;
 use OC\User\NoUserException;
 use OCP\Files\Folder;
 use OCP\Files\IRootFolder;
@@ -39,6 +40,9 @@ use OCP\Share\IShare;
 use Symfony\Component\Serializer\Encoder\CsvEncoder;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Serializer;
+use Throwable;
+use function iter\filter;
+use function iter\map;
 
 class SharesList {
 
@@ -50,21 +54,11 @@ class SharesList {
 	public const FILTER_HAS_EXPIRATION = 5;
 	public const FILTER_NO_EXPIRATION = 6;
 
-	/** @var ShareManager */
-	private $shareManager;
-
-	/** @var IUserManager */
-	private $userManager;
-
-	/** @var IRootFolder */
-	private $rootFolder;
-
-	public function __construct(ShareManager $shareManager,
-		IUserManager $userManager,
-		IRootFolder $rootFolder) {
-		$this->shareManager = $shareManager;
-		$this->userManager = $userManager;
-		$this->rootFolder = $rootFolder;
+	public function __construct(
+		private ShareManager $shareManager,
+		private IUserManager $userManager,
+		private IRootFolder $rootFolder,
+	) {
 	}
 
 	private function getShareTypes(): array {
@@ -77,7 +71,7 @@ class SharesList {
 		];
 	}
 
-	public function get(?string $userId, int $filter, ?string $path = null, ?string $token = null): \Iterator {
+	public function get(?string $userId, int $filter, ?string $path = null, ?string $token = null): Iterator {
 		$shares = $this->getShares($userId);
 
 		// If path is set. Filter for the current user
@@ -85,11 +79,11 @@ class SharesList {
 			$userFolder = $this->rootFolder->getUserFolder($userId);
 			try {
 				$node = $userFolder->get($path);
-			} catch (NotFoundException $e) {
+			} catch (NotFoundException) {
 				// Path is not valid for user so nothing to report;
-				return new \EmptyIterator();
+				return new EmptyIterator();
 			}
-			$shares = iter\filter(function (IShare $share) use ($node) {
+			$shares = filter(function (IShare $share) use ($node) {
 				if ($node->getId() === $share->getNodeId()) {
 					return true;
 				}
@@ -104,40 +98,30 @@ class SharesList {
 		}
 
 		if ($filter === self::FILTER_OWNER) {
-			$shares = iter\filter(function (IShare $share) use ($userId) {
-				return $share->getShareOwner() === $userId;
-			}, $shares);
+			$shares = filter(fn (IShare $share) => $share->getShareOwner() === $userId, $shares);
 		}
 		if ($filter === self::FILTER_INITIATOR) {
-			$shares = iter\filter(function (IShare $share) use ($userId) {
-				return $share->getSharedBy() === $userId;
-			}, $shares);
+			$shares = filter(fn (IShare $share) => $share->getSharedBy() === $userId, $shares);
 		}
 		if ($filter === self::FILTER_RECIPIENT) {
 			// We can't check the recipient since this might be a group share etc. However you can't share to yourself
-			$shares = iter\filter(function (IShare $share) use ($userId) {
-				return $share->getShareOwner() !== $userId && $share->getSharedBy() !== $userId;
-			}, $shares);
+			$shares = filter(fn (IShare $share) => $share->getShareOwner() !== $userId && $share->getSharedBy() !== $userId, $shares);
 		}
 
 		if ($filter === self::FILTER_HAS_EXPIRATION) {
-			$shares = iter\filter(function (IShare $share) use ($userId): bool {
-				return $share->getExpirationDate() !== null;
-			}, $shares);
+			$shares = filter(fn (IShare $share): bool => $share->getExpirationDate() !== null, $shares);
 		}
 
 		if ($filter === self::FILTER_NO_EXPIRATION) {
-			$shares = iter\filter(function (IShare $share) use ($userId): bool {
-				return $share->getExpirationDate() === null;
-			}, $shares);
+			$shares = filter(fn (IShare $share): bool => $share->getExpirationDate() === null, $shares);
 		}
 
-		$shares = iter\filter(function (IShare $share): bool {
+		$shares = filter(function (IShare $share): bool {
 			try {
 				$userFolder = $this->rootFolder->getUserFolder($share->getShareOwner());
-			} catch (NoUserException $e) {
+			} catch (NoUserException) {
 				return false;
-			} catch (\Throwable $e) {
+			} catch (Throwable) {
 				return false;
 			}
 			$nodes = $userFolder->getById($share->getNodeId());
@@ -154,19 +138,19 @@ class SharesList {
 	 * This allows us to build a list of subfiles/folder that are shared
 	 * as well
 	 */
-	public function getSub(string $userId, int $filter, string $path): \Iterator {
+	public function getSub(string $userId, int $filter, string $path): Iterator {
 		$shares = $this->shareManager->getAllShares();
 
 		// If path is set. Filter for the current user
 		$userFolder = $this->rootFolder->getUserFolder($userId);
 		try {
 			$node = $userFolder->get($path);
-		} catch (NotFoundException $e) {
+		} catch (NotFoundException) {
 			// Path is not valid for user so nothing to report;
-			return new \EmptyIterator();
+			return new EmptyIterator();
 		}
 
-		$shares = iter\filter(function (IShare $share) use ($node) {
+		$shares = filter(function (IShare $share) use ($node) {
 			if ($node->getId() === $share->getNodeId()) {
 				return false;
 			}
@@ -177,28 +161,22 @@ class SharesList {
 		}, $shares);
 
 		if ($filter === self::FILTER_OWNER) {
-			$shares = iter\filter(function (IShare $share) use ($userId) {
-				return $share->getShareOwner() === $userId;
-			}, $shares);
+			$shares = filter(fn (IShare $share) => $share->getShareOwner() === $userId, $shares);
 		}
 		if ($filter === self::FILTER_INITIATOR) {
-			$shares = iter\filter(function (IShare $share) use ($userId) {
-				return $share->getSharedBy() === $userId;
-			}, $shares);
+			$shares = filter(fn (IShare $share) => $share->getSharedBy() === $userId, $shares);
 		}
 		if ($filter === self::FILTER_RECIPIENT) {
 			// We can't check the recipient since this might be a group share etc. However you can't share to yourself
-			$shares = iter\filter(function (IShare $share) use ($userId) {
-				return $share->getShareOwner() !== $userId && $share->getSharedBy() !== $userId;
-			}, $shares);
+			$shares = filter(fn (IShare $share) => $share->getShareOwner() !== $userId && $share->getSharedBy() !== $userId, $shares);
 		}
 
-		$shares = iter\filter(function (IShare $share) {
+		$shares = filter(function (IShare $share) {
 			try {
 				$userFolder = $this->rootFolder->getUserFolder($share->getShareOwner());
-			} catch (NoUserException $e) {
+			} catch (NoUserException) {
 				return false;
-			} catch (\Throwable $e) {
+			} catch (Throwable) {
 				return false;
 			}
 			$nodes = $userFolder->getById($share->getNodeId());
@@ -209,17 +187,15 @@ class SharesList {
 		return $shares;
 	}
 
-	public function getFormattedShares(?string $userId = null, int $filter = self::FILTER_NONE, ?string $path = null, ?string $token = null): \Iterator {
+	public function getFormattedShares(?string $userId = null, int $filter = self::FILTER_NONE, ?string $path = null, ?string $token = null): Iterator {
 		$shares = $this->get($userId, $filter, $path, $token);
 
-		$formattedShares = iter\map(function (IShare $share): array {
-			return $this->formatShare($share);
-		}, $shares);
+		$formattedShares = map(fn (IShare $share): array => $this->formatShare($share), $shares);
 
 		return $formattedShares;
 	}
 
-	private function getShares(?string $userId): \Iterator {
+	private function getShares(?string $userId): Iterator {
 		if (empty($userId)) {
 			$shares = $this->shareManager->getAllShares();
 		} else {
@@ -228,7 +204,7 @@ class SharesList {
 			foreach ($shareTypes as $shareType) {
 				$shares = $this->shareManager->getSharesBy($userId, $shareType, null, true, -1, 0);
 
-				if ($shareType !== \OCP\Share\IShare::TYPE_LINK) {
+				if ($shareType !== IShare::TYPE_LINK) {
 					foreach ($shares as $share) {
 						yield $share;
 					}
@@ -293,26 +269,14 @@ class SharesList {
 	}
 
 	public function filterStringToInt(?string $filterString): int {
-		switch ($filterString) {
-			case 'owner':
-				$filter = SharesList::FILTER_OWNER;
-				break;
-			case 'initiator':
-				$filter = SharesList::FILTER_INITIATOR;
-				break;
-			case 'recipient':
-				$filter = SharesList::FILTER_RECIPIENT;
-				break;
-			case 'has-expiration':
-				$filter = SharesList::FILTER_HAS_EXPIRATION;
-				break;
-			case 'no-expiration':
-				$filter = SharesList::FILTER_NO_EXPIRATION;
-				break;
-			default:
-				$filter = SharesList::FILTER_NONE;
-				break;
-		}
+		$filter = match ($filterString) {
+			'owner' => SharesList::FILTER_OWNER,
+			'initiator' => SharesList::FILTER_INITIATOR,
+			'recipient' => SharesList::FILTER_RECIPIENT,
+			'has-expiration' => SharesList::FILTER_HAS_EXPIRATION,
+			'no-expiration' => SharesList::FILTER_NO_EXPIRATION,
+			default => SharesList::FILTER_NONE,
+		};
 
 		return $filter;
 	}
