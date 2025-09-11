@@ -1,6 +1,6 @@
 {
   "name": "sharelisting",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "This app allows generating reports of shares on the system.",
   "main": "main.js",
   "private": true,
