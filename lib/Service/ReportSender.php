@@ -1,29 +1,10 @@
 <?php
 
 declare(strict_types=1);
-/**
- * @copyright Copyright (c) 2022 Solution Libre SAS
- * @copyright Copyright (c) 2020 Robin Appelman <robin@icewind.nl>
- *
- * @author Florent Poinsaut <florent@solution-libre.fr>
- * @author Robin Appelman <robin@icewind.nl>
- *
- * @license GNU AGPL version 3 or any later version
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- */
+
+// SPDX-FileCopyrightText: 2020 Robin Appelman <robin@icewind.nl>
+// SPDX-FileCopyrightText: 2022 Solution Libre SAS
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 namespace OCA\ShareListing\Service;
 
@@ -54,50 +35,21 @@ use Swaggest\JsonDiff\JsonDiff;
 class ReportSender {
 	protected const REPORT_NAME = ' - Shares report.';
 
-	/** @var string */
-	private $appName;
-	/** @var Iconfig */
-	private $config;
-	/** @var ?array */
-	protected $diffReport = null;
-
-	private $mailer;
-	private $userManager;
-	private $defaults;
-	private $l10nFactory;
-	private $logger;
-
-	/** @var array */
-	protected $reports = [];
-	/** @var SharesList */
-	private $sharesList;
-	/** @var IRootFolder */
-	private $root;
-	/** @var IURLGenerator */
-	protected $url;
+	protected ?array $diffReport = null;
+	protected array $reports = [];
 
 	public function __construct(
-		string $appName,
-		IConfig $config,
-		IMailer $mailer,
-		IUserManager $userManager,
-		Defaults $defaults,
-		IFactory $l10nFactory,
-		LoggerInterface $logger,
-		SharesList $sharesList,
-		IRootFolder $root,
-		IURLGenerator $url,
+		private readonly string $appName,
+		private readonly IConfig $config,
+		private readonly IMailer $mailer,
+		private readonly IUserManager $userManager,
+		private readonly Defaults $defaults,
+		private readonly IFactory $l10nFactory,
+		private readonly LoggerInterface $logger,
+		private readonly SharesList $sharesList,
+		private readonly IRootFolder $root,
+		private readonly IURLGenerator $url,
 	) {
-		$this->appName = $appName;
-		$this->config = $config;
-		$this->mailer = $mailer;
-		$this->userManager = $userManager;
-		$this->defaults = $defaults;
-		$this->l10nFactory = $l10nFactory;
-		$this->logger = $logger;
-		$this->sharesList = $sharesList;
-		$this->root = $root;
-		$this->url = $url;
 	}
 
 	public function createReport(
@@ -108,7 +60,7 @@ class ReportSender {
 		int $filter = SharesList::FILTER_NONE,
 		?string $path = null,
 		?string $token = null,
-	) {
+	): void {
 		$userFolder = $this->root->getUserFolder($recipient);
 
 		if ($userFolder->nodeExists($targetPath)) {
@@ -146,7 +98,7 @@ class ReportSender {
 		}
 	}
 
-	public function sendReport(string $recipient, \DateTimeImmutable $dateTime) {
+	public function sendReport(string $recipient, \DateTimeImmutable $dateTime): void {
 		$defaultLanguage = $this->config->getSystemValue('default_language', 'en');
 		$userLanguages = $this->config->getUserValue($recipient, 'core', 'lang');
 		$language = (!empty($userLanguages)) ? $userLanguages : $defaultLanguage;
@@ -199,7 +151,6 @@ class ReportSender {
 			$this->mailer->send($message);
 		} catch (\Exception $e) {
 			$this->logger->error($e->getMessage());
-			return;
 		}
 	}
 
@@ -228,7 +179,7 @@ class ReportSender {
 	public function diff(
 		string $userId,
 		string $dir,
-	) {
+	): void {
 		$userFolder = $this->root->getUserFolder($userId);
 
 		if ($userFolder->nodeExists($dir)) {
