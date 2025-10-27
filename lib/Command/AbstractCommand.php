@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 /**
  * @copyright Copyright (c) 2022 Solution Libre SAS
@@ -27,44 +28,40 @@ declare(strict_types=1);
 
 namespace OCA\ShareListing\Command;
 
-use OCA\ShareListing\Service\SharesList;
 use OC\Core\Command\Base;
+use OCA\ShareListing\Service\SharesList;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 
 abstract class AbstractCommand extends Base {
-	/** @var SharesList */
-	protected $sharesList;
-
-	public function __construct(SharesList $sharesList) {
+	public function __construct(
+		protected readonly SharesList $sharesList,
+	) {
 		parent::__construct();
-
-		$this->sharesList = $sharesList;
 	}
 
-	public function configure() {
+	public function configure(): void {
 		$this->addOption(
-				'user',
-				'u',
-				InputOption::VALUE_OPTIONAL,
-				'Will list shares of the given user'
-			)
-			->addOption(
-				'path',
-				'p',
-				InputOption::VALUE_OPTIONAL,
-				'Will only consider the given path'
-			)->addOption(
-				'token',
-				't',
-				InputOption::VALUE_OPTIONAL,
-				'Will only consider the given token'
-			)->addOption(
-				'filter',
-				'f',
-				InputOption::VALUE_OPTIONAL,
-				'Filter shares, possible values: owner, initiator, recipient, token, has-expiration, no-expiration'
-			);
+			'user',
+			'u',
+			InputOption::VALUE_OPTIONAL,
+			'Will list shares of the given user'
+		)->addOption(
+			'path',
+			'p',
+			InputOption::VALUE_OPTIONAL,
+			'Will only consider the given path'
+		)->addOption(
+			'token',
+			't',
+			InputOption::VALUE_OPTIONAL,
+			'Will only consider the given token'
+		)->addOption(
+			'filter',
+			'f',
+			InputOption::VALUE_OPTIONAL,
+			'Filter shares, possible values: owner, initiator, recipient, token, has-expiration, no-expiration'
+		);
 	}
 
 	protected function getOptions(InputInterface $input): array {

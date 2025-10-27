@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 /**
  * @copyright Copyright (c) 2022 Solution Libre SAS
@@ -34,25 +35,19 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * @psalm-api
+ */
 class SendShares extends AbstractCommand {
-	/** @var IUserManager */
-	private $userManager;
-
-	/** @var ReportSender */
-	private $reportSender;
-
 	public function __construct(
-		IUserManager $userManager,
-		ReportSender $reportSender,
-		SharesList $sharesList
+		private readonly IUserManager $userManager,
+		private readonly ReportSender $reportSender,
+		SharesList $sharesList,
 	) {
 		parent::__construct($sharesList);
-
-		$this->userManager = $userManager;
-		$this->reportSender = $reportSender;
 	}
 
-	public function configure() {
+	public function configure(): void {
 		parent::configure();
 
 		$this->setName('sharing:send')
@@ -107,34 +102,33 @@ class SendShares extends AbstractCommand {
 		return 0;
 	}
 
-	protected function checkAllRequiredOptionsAreNotEmpty(InputInterface $input)
-    {
-        $errors = [];
+	protected function checkAllRequiredOptionsAreNotEmpty(InputInterface $input): void {
+		$errors = [];
 
 		if (!$input->getOption('target-path')) {
 			$errors[] = 'The required option --target-path is not set or is empty.';
 		}
 
-        $recipients = $this->getDefinition()->getOption('recipients');
+		$recipients = $this->getDefinition()->getOption('recipients');
 
-        /** @var InputOption $recipient */
-        foreach ([$recipients] as $recipient) {
-            $name = $recipient->getName();
-            $values = $input->getOption($name);
+		/** @var InputOption $option */
+		foreach ([$recipients] as $option) {
+			$name = $option->getName();
+			$values = $input->getOption($name);
 
-            if ($values === null || $values === '' || ($recipient->isArray() && empty($values))) {
-                $errors[] = sprintf('The required option --%s is not set or is empty.', $name);
-            }
+			if ($values === null || $values === '' || ($option->isArray() && empty($values))) {
+				$errors[] = sprintf('The required option --%s is not set or is empty.', $name);
+			}
 
 			foreach ($values as $value) {
 				if (!$this->userManager->userExists($value)) {
 					$errors[] = sprintf('The recipient user %s does not exist.', $value);
 				}
 			}
-        }
+		}
 
-        if (count($errors)) {
-            throw new \InvalidArgumentException(implode("\n\n", $errors));
-        }
-    }
+		if (count($errors)) {
+			throw new \InvalidArgumentException(implode("\n\n", $errors));
+		}
+	}
 }

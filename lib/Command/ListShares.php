@@ -32,8 +32,11 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use function iter\toArray;
 
+/**
+ * @psalm-api
+ */
 class ListShares extends AbstractCommand {
-	public function configure() {
+	public function configure(): void {
 		$this->setName('sharing:list')
 			->setDescription('List who has access to shares by owner')
 			->addOption(

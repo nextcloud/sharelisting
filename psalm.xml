@@ -12,6 +12,21 @@
 >
 	<stubs>
 		<file name="tests/stub.phpstub" preloadClasses="true"/>
+		<file name="tests/stubs/oc_core_command_base.php" />
+		<file name="tests/stubs/oc_files_search_searchbinaryoperator.php" />
+		<file name="tests/stubs/oc_files_search_searchcomparison.php" />
+		<file name="tests/stubs/oc_files_search_searchquery.php" />
+		<file name="tests/stubs/oc_files_search_searchorder.php" />
+		<file name="tests/stubs/stecman_component_symfony_console_bashcompletion_completion_completionawareinterface.php" />
+		<file name="tests/stubs/symfony_component_console_command_command.php" />
+		<file name="tests/stubs/symfony_component_console_helper_table.php" />
+		<file name="tests/stubs/symfony_component_console_input_inputargument.php" />
+		<file name="tests/stubs/symfony_component_console_input_inputinterface.php" />
+		<file name="tests/stubs/symfony_component_console_input_inputoption.php" />
+		<file name="tests/stubs/symfony_component_console_output_outputinterface.php" />
+		<file name="tests/stubs/symfony_component_console_question_confirmationquestion.php" />
+		<file name="tests/stubs/symfony_component_console_question_confirmationquestion.php" />
+		<file name="tests/stubs/symfony_component_console_question_question.php" />
 	</stubs>
 	<projectFiles>
 		<directory name="lib" />

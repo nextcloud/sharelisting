@@ -7,7 +7,7 @@ declare(strict_types=1);
  *
  * @author Florent Poinsaut <florent@solution-libre.fr>
  * @author Robin Appelman <robin@icewind.nl>
- * 
+ *
  * @license GNU AGPL version 3 or any later version
  *
  * This program is free software: you can redistribute it and/or modify
@@ -32,8 +32,8 @@ use OC\Files\Search\SearchBinaryOperator;
 use OC\Files\Search\SearchComparison;
 use OC\Files\Search\SearchOrder;
 use OC\Files\Search\SearchQuery;
-use OCA\ShareListing\Service\SharesList;
 use OCP\Defaults;
+use OCP\Files\File;
 use OCP\Files\FileInfo;
 use OCP\Files\Folder;
 use OCP\Files\InvalidDirectoryException;
@@ -51,8 +51,7 @@ use OCP\Util;
 use Psr\Log\LoggerInterface;
 use Swaggest\JsonDiff\JsonDiff;
 
-class ReportSender
-{
+class ReportSender {
 	protected const REPORT_NAME = ' - Shares report.';
 
 	/** @var string */
@@ -87,7 +86,7 @@ class ReportSender
 		LoggerInterface $logger,
 		SharesList $sharesList,
 		IRootFolder $root,
-		IURLGenerator $url
+		IURLGenerator $url,
 	) {
 		$this->appName = $appName;
 		$this->config = $config;
@@ -107,8 +106,8 @@ class ReportSender
 		\DateTimeImmutable $dateTime,
 		?string $userId = '',
 		int $filter = SharesList::FILTER_NONE,
-		string $path = null,
-		string $token = null
+		?string $path = null,
+		?string $token = null,
 	) {
 		$userFolder = $this->root->getUserFolder($recipient);
 
@@ -147,8 +146,7 @@ class ReportSender
 		}
 	}
 
-	public function sendReport(string $recipient, \DateTimeImmutable $dateTime)
-	{
+	public function sendReport(string $recipient, \DateTimeImmutable $dateTime) {
 		$defaultLanguage = $this->config->getSystemValue('default_language', 'en');
 		$userLanguages = $this->config->getUserValue($recipient, 'core', 'lang');
 		$language = (!empty($userLanguages)) ? $userLanguages : $defaultLanguage;
@@ -205,8 +203,7 @@ class ReportSender
 		}
 	}
 
-	protected function getEmailAdressFromUserId(string $userId): ?string
-	{
+	protected function getEmailAdressFromUserId(string $userId): ?string {
 		$user = $this->userManager->get($userId);
 		if ($user === null) {
 			$this->logger->warning(
@@ -230,7 +227,7 @@ class ReportSender
 
 	public function diff(
 		string $userId,
-		string $dir
+		string $dir,
 	) {
 		$userFolder = $this->root->getUserFolder($userId);
 
@@ -266,6 +263,7 @@ class ReportSender
 			throw new NotFoundException('No previous report found on this folder.');
 		}
 
+		/** @var File $previousFile */
 		$previousFile = $search[0];
 		$previousFilename = $previousFile->getName();
 		$previousDateTime = substr($previousFilename, 0, 12);
