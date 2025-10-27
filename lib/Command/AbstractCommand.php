@@ -1,7 +1,7 @@
 <?php
-
 declare(strict_types=1);
 /**
+ * @copyright Copyright (c) 2022 Solution Libre SAS
  * @copyright Copyright (c) 2018 Roeland Jago Douma <roeland@famdouma.nl>
  *
  * @author Florent Poinsaut <florent@solution-libre.fr>
@@ -27,31 +27,52 @@ declare(strict_types=1);
 
 namespace OCA\ShareListing\Command;
 
+use OCA\ShareListing\Service\SharesList;
+use OC\Core\Command\Base;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\OutputInterface;
-use function iter\toArray;
 
-class ListShares extends AbstractCommand {
+abstract class AbstractCommand extends Base {
+	/** @var SharesList */
+	protected $sharesList;
+
+	public function __construct(SharesList $sharesList) {
+		parent::__construct();
+
+		$this->sharesList = $sharesList;
+	}
+
 	public function configure() {
-		$this->setName('sharing:list')
-			->setDescription('List who has access to shares by owner')
-			->addOption(
-				'output',
-				'o',
+		$this->addOption(
+				'user',
+				'u',
 				InputOption::VALUE_OPTIONAL,
-				'Output format (json or csv, default is json)',
-				'json'
+				'Will list shares of the given user'
+			)
+			->addOption(
+				'path',
+				'p',
+				InputOption::VALUE_OPTIONAL,
+				'Will only consider the given path'
+			)->addOption(
+				'token',
+				't',
+				InputOption::VALUE_OPTIONAL,
+				'Will only consider the given token'
+			)->addOption(
+				'filter',
+				'f',
+				InputOption::VALUE_OPTIONAL,
+				'Filter shares, possible values: owner, initiator, recipient, token, has-expiration, no-expiration'
 			);
 	}
 
-	protected function execute(InputInterface $input, OutputInterface $output): int {
-		[$user, $path, $token, $filter] = $this->getOptions($input);
-		$outputOpt = $input->getOption('output');
+	protected function getOptions(InputInterface $input): array {
+		$user = $input->getOption('user');
+		$path = $input->getOption('path');
+		$token = $input->getOption('token');
+		$filter = $this->sharesList->filterStringToInt($input->getOption('filter'));
 
-		$shares = toArray($this->sharesList->getFormattedShares($user, $filter, $path, $token));
-
-		$output->writeln($this->sharesList->getSerializedShares($shares, $outputOpt));
-		return 0;
+		return [$user, $path, $token, $filter];
 	}
 }
