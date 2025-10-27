@@ -17,5 +17,6 @@
 
 	<commands>
 		<command>OCA\ShareListing\Command\ListShares</command>
+		<command>OCA\ShareListing\Command\SendShares</command>
 	</commands>
 </info>

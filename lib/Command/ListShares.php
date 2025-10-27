@@ -27,53 +27,18 @@ declare(strict_types=1);
 
 namespace OCA\ShareListing\Command;
 
-use OC\Core\Command\Base;
-use OCA\ShareListing\Service\SharesList;
-use OCP\Files\IRootFolder;
-use OCP\IUserManager;
-use OCP\Share\IManager as ShareManager;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use function iter\toArray;
 
-class ListShares extends Base {
-
-	public function __construct(
-		private ShareManager $shareManager,
-		private IUserManager $userManager,
-		private IRootFolder $rootFolder,
-		private SharesList $sharesList,
-	) {
-		parent::__construct();
-
-	}
-
-	public function configure() {
+/**
+ * @psalm-api
+ */
+class ListShares extends AbstractCommand {
+	public function configure(): void {
 		$this->setName('sharing:list')
 			->setDescription('List who has access to shares by owner')
-			->addOption(
-				'user',
-				'u',
-				InputOption::VALUE_OPTIONAL,
-				'Will list shares of the given user'
-			)
-			->addOption(
-				'path',
-				'p',
-				InputOption::VALUE_OPTIONAL,
-				'Will only consider the given path'
-			)->addOption(
-				'token',
-				't',
-				InputOption::VALUE_OPTIONAL,
-				'Will only consider the given token'
-			)->addOption(
-				'filter',
-				'f',
-				InputOption::VALUE_OPTIONAL,
-				'Filter shares, possible values: owner, initiator, recipient, token, has-expiration, no-expiration'
-			)
 			->addOption(
 				'output',
 				'o',
@@ -84,10 +49,7 @@ class ListShares extends Base {
 	}
 
 	protected function execute(InputInterface $input, OutputInterface $output): int {
-		$user = $input->getOption('user');
-		$path = $input->getOption('path');
-		$token = $input->getOption('token');
-		$filter = $this->sharesList->filterStringToInt($input->getOption('filter'));
+		[$user, $path, $token, $filter] = $this->getOptions($input);
 		$outputOpt = $input->getOption('output');
 
 		$shares = toArray($this->sharesList->getFormattedShares($user, $filter, $path, $token));

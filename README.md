@@ -4,7 +4,9 @@ This app allows generating reports of shares on the system.
 
 ## Usage
 
-### Command
+### Commands
+
+#### List
 
 ```sh
 ./occ sharing:list [-u|--user [USER]] [-p|--path [PATH]] [-t|--token [TOKEN]] [-f|--filter [FILTER]] [-o|--output FORMAT]
@@ -13,7 +15,7 @@ This app allows generating reports of shares on the system.
 Without options, the command yields the unfiltered list of all shares.\
 With options, the list is narrowed down using the filters set.
 
-### Options
+##### Options
 
 * `-u [USER]` or `--user [USER]`\
   List only shares of the given user.
@@ -26,6 +28,33 @@ With options, the list is narrowed down using the filters set.
   Possible values for the filter argument: {owner, initiator, recipient}
 * `-o FORMAT` or `--output FORMAT`\
   Set the output format (json or csv, default is json).
+
+#### Send
+
+```sh
+./occ sharing:send [-u|--user USER] [-p|--path PATH] [-t|--token TOKEN] [-f|--filter FILTER] [-o|--output FORMAT]
+```
+
+Without options, the command yields the unfiltered list of all shares.\
+With options, the list is narrowed down using the filters set.
+
+##### Options
+
+* `-r` or `--recipients`\
+  Recipients users of generated reports.
+* `-x` or `--target-path`\
+  Generated reports will be stored on this path.
+* `-d` or `--diff`\
+  Create a differential report in json format from the last available report.
+* `-u [USER]` or `--user [USER]`\
+  List only shares of the given user.
+* `-p [PATH]` or `--path [PATH]`\
+  List only shares within the given path.
+* `-t [TOKEN]` or `--token [TOKEN]`\
+  List only shares that use a token that (at least partly) matches the argument.
+* `-f [FILTER]` or `--filter [FILTER]`\
+  List only shares where the TYPE matches the argument.\
+  Possible values for the filter argument: {owner, initiator, recipient}
 
 ## Examples
 
