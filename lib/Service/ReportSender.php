@@ -8,7 +8,6 @@ declare(strict_types=1);
 
 namespace OCA\ShareListing\Service;
 
-use iter;
 use OC\Files\Search\SearchBinaryOperator;
 use OC\Files\Search\SearchComparison;
 use OC\Files\Search\SearchOrder;
@@ -20,6 +19,7 @@ use OCP\Files\Folder;
 use OCP\Files\InvalidDirectoryException;
 use OCP\Files\IRootFolder;
 use OCP\Files\NotFoundException;
+use OCP\Files\NotPermittedException;
 use OCP\Files\Search\ISearchBinaryOperator;
 use OCP\Files\Search\ISearchComparison;
 use OCP\Files\Search\ISearchOrder;
@@ -63,16 +63,13 @@ class ReportSender {
 	): void {
 		$userFolder = $this->root->getUserFolder($recipient);
 
-		if ($userFolder->nodeExists($targetPath)) {
+		try {
 			/** @var Folder $folder */
 			$folder = $userFolder->get($targetPath);
 			if ($folder->getType() !== FileInfo::TYPE_FOLDER) {
-				$this->logger->warning(
-					'Target path ' . $targetPath . ' is not a folder',
-					['app' => $this->appName]
-				);
+				throw new \RuntimeException('Target path ' . $targetPath . ' is not a folder');
 			}
-		} else {
+		} catch (NotFoundException|NotPermittedException $e) {
 			$folder = $userFolder->newFolder($targetPath);
 		}
 
@@ -82,7 +79,7 @@ class ReportSender {
 			$fileName = $formatedDateTime . self::REPORT_NAME . $format;
 			if (!array_key_exists($fileName, $this->reports)) {
 				if ($key === array_key_first($formats)) {
-					$shares = iter\toArray($this->sharesList->getFormattedShares($userId, $filter, $path, $token));
+					$shares = iterator_to_array($this->sharesList->getFormattedShares($userId, $filter, $path, $token));
 				}
 				$reportFile = $folder->newFile($fileName);
 				$data = $this->sharesList->getSerializedShares($shares, $format);
