@@ -32,10 +32,12 @@ use OCP\Util;
 use Psr\Log\LoggerInterface;
 use Swaggest\JsonDiff\JsonDiff;
 
-class ReportSender {
+final class ReportSender {
 	protected const REPORT_NAME = ' - Shares report.';
 
+	/** @var array{url: string, fileName: string}|null */
 	protected ?array $diffReport = null;
+	/** @var array<string, array{url: string, data: string}> */
 	protected array $reports = [];
 
 	public function __construct(
@@ -75,12 +77,10 @@ class ReportSender {
 
 		$formats = ['json', 'csv'];
 		$formatedDateTime = $dateTime->format('YmdHi');
-		foreach ($formats as $key => $format) {
+		$shares = iterator_to_array($this->sharesList->getFormattedShares($userId, $filter, $path, $token));
+		foreach ($formats as $format) {
 			$fileName = $formatedDateTime . self::REPORT_NAME . $format;
 			if (!array_key_exists($fileName, $this->reports)) {
-				if ($key === array_key_first($formats)) {
-					$shares = iterator_to_array($this->sharesList->getFormattedShares($userId, $filter, $path, $token));
-				}
 				$reportFile = $folder->newFile($fileName);
 				$data = $this->sharesList->getSerializedShares($shares, $format);
 				$reportFile->putContent($data);
@@ -96,7 +96,7 @@ class ReportSender {
 	}
 
 	public function sendReport(string $recipient, \DateTimeImmutable $dateTime): void {
-		$defaultLanguage = $this->config->getSystemValue('default_language', 'en');
+		$defaultLanguage = $this->config->getSystemValueString('default_language', 'en');
 		$userLanguages = $this->config->getUserValue($recipient, 'core', 'lang');
 		$language = (!empty($userLanguages)) ? $userLanguages : $defaultLanguage;
 
@@ -215,7 +215,8 @@ class ReportSender {
 		$previousFile = $search[0];
 		$previousFilename = $previousFile->getName();
 		$previousDateTime = substr($previousFilename, 0, 12);
-		$previousContent = json_decode($previousFile->getContent());
+		/** @var list<object{id: string}> $previousContent */
+		$previousContent = json_decode($previousFile->getContent(), flags: JSON_THROW_ON_ERROR);
 		$previousContentWithId = [];
 		foreach ($previousContent as $value) {
 			$previousContentWithId[$value->id] = $value;
@@ -223,6 +224,7 @@ class ReportSender {
 
 		$newFilename = array_keys($this->reports)[0];
 		$newDateTime = substr($newFilename, 0, 12);
+		/** @var list<object{id: string}> $newContent */
 		$newContent = json_decode(array_values($this->reports)[0]['data']);
 		$newContentWithId = [];
 		foreach ($newContent as $value) {
@@ -243,7 +245,7 @@ class ReportSender {
 			'modified' => $jsonDiff->getModifiedDiff()
 		];
 
-		$reportFile->putContent(json_encode($res, JSON_PRETTY_PRINT));
+		$reportFile->putContent(json_encode($res, JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR));
 
 		$this->diffReport = [
 			'url' => $this->url->linkToRouteAbsolute(

@@ -36,6 +36,9 @@ use function iter\filter;
 use function iter\map;
 use function iter\toArray;
 
+/**
+ * @psalm-api
+ */
 class ApiController extends OCSController {
 	public function __construct(
 		string $appName,
@@ -67,15 +70,17 @@ class ApiController extends OCSController {
 		$formattedShares = map(fn (IShare $share) => $this->sharesList->formatShare($share), $shares);
 
 		// remove current folder
-		$filteredShares = filter(fn ($share) => $share['path'] !== $path, $formattedShares);
+		$filteredShares = filter(fn (array $share): bool => $share['path'] !== $path, $formattedShares);
 
 		// sort directories first
 		$sortedShares = toArray($filteredShares);
-		usort($sortedShares, function ($a, $b) {
+		usort($sortedShares, function (array $a, array $b): int {
+			/** @var array{is_directory: bool, path: string} $a */
+			/** @var array{is_directory: bool, path: string} $b */
 			if ($a['is_directory'] && $b['is_directory']) {
 				return strcmp($a['path'], $b['path']);
 			}
-			return $b['is_directory'] - $a['is_directory'];
+			return (int)$b['is_directory'] - (int)$a['is_directory'];
 		});
 
 		return new DataResponse($sortedShares);

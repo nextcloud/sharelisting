@@ -35,6 +35,9 @@ use OCP\AppFramework\Bootstrap\IRegistrationContext;
 
 include_once __DIR__ . '/../../vendor/autoload.php';
 
+/**
+ * @psalm-api
+ */
 class Application extends App implements IBootstrap {
 
 	public const appID = 'sharelisting';

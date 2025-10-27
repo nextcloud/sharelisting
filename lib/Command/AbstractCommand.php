@@ -45,12 +45,19 @@ abstract class AbstractCommand extends Base {
 		);
 	}
 
+	/**
+	 * @return array{0: string, 1: string, 2: string, 3: int}
+	 */
 	protected function getOptions(InputInterface $input): array {
+		/** @var string $user */
 		$user = $input->getOption('user');
+		/** @var string $path */
 		$path = $input->getOption('path');
+		/** @var string $token */
 		$token = $input->getOption('token');
-		$filter = $this->sharesList->filterStringToInt($input->getOption('filter'));
+		/** @var string $filter */
+		$filter = $input->getOption('filter');
 
-		return [$user, $path, $token, $filter];
+		return [$user, $path, $token, $this->sharesList->filterStringToInt($filter)];
 	}
 }
