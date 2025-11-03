@@ -34,7 +34,7 @@ use OCP\Util;
 /**
  * @template-implements IEventListener<LoadSidebar>
  */
-class LoadSidebarScript implements IEventListener {
+final class LoadSidebarScript implements IEventListener {
 	public function handle(Event $event): void {
 		if (!($event instanceof LoadSidebar)) {
 			return;

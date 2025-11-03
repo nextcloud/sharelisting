@@ -1,29 +1,12 @@
 <?php
 
 declare(strict_types=1);
-/**
- * @copyright Copyright (c) 2018 Roeland Jago Douma <roeland@famdouma.nl>
- *
- * @author Florent Poinsaut <florent@solution-libre.fr>
- * @author Roeland Jago Douma <roeland@famdouma.nl>
- * @author John Molakvoæ <skjnldsv@protonmail.com>
- *
- * @license GNU AGPL version 3 or any later version
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- */
+
+// SPDX-FileCopyrightText: 2018 Nextcloud GmbH
+// SPDX-FileCopyrightText: 2022 Solution Libre SAS
+// SPDX-FileContributor: Roeland Jago Douma <roeland@famdouma.nl>
+// SPDX-FileContributor: Florent Poinsaut <florent@solution-libre.fr>
+// SPDX-FileContributor: John Molakvoæ <skjnldsv@protonmail.com>
 
 namespace OCA\ShareListing\Service;
 
@@ -33,7 +16,6 @@ use OC\User\NoUserException;
 use OCP\Files\Folder;
 use OCP\Files\IRootFolder;
 use OCP\Files\NotFoundException;
-use OCP\IUserManager;
 use OCP\Share;
 use OCP\Share\IManager as ShareManager;
 use OCP\Share\IShare;
@@ -44,7 +26,7 @@ use Throwable;
 use function iter\filter;
 use function iter\map;
 
-class SharesList {
+final class SharesList {
 
 	public const FILTER_NONE = 0;
 	public const FILTER_OWNER = 1;
@@ -56,11 +38,13 @@ class SharesList {
 
 	public function __construct(
 		private ShareManager $shareManager,
-		private IUserManager $userManager,
 		private IRootFolder $rootFolder,
 	) {
 	}
 
+	/**
+	 * @return non-empty-array<IShare::TYPE_*>
+	 */
 	private function getShareTypes(): array {
 		return [
 			IShare::TYPE_USER,
@@ -71,11 +55,18 @@ class SharesList {
 		];
 	}
 
+	/**
+	 * @return Iterator<IShare>
+	 */
 	public function get(?string $userId, int $filter, ?string $path = null, ?string $token = null): Iterator {
+		/** @var iterable<IShare> $shares */
 		$shares = $this->getShares($userId);
 
 		// If path is set. Filter for the current user
 		if ($path !== null) {
+			if ($userId === null) {
+				throw new \RuntimeException('Unable to query a path if no user is set.');
+			}
 			$userFolder = $this->rootFolder->getUserFolder($userId);
 			try {
 				$node = $userFolder->get($path);
@@ -137,8 +128,10 @@ class SharesList {
 	 * Get all shares. And filter them by being a subpath of the current path.
 	 * This allows us to build a list of subfiles/folder that are shared
 	 * as well
+	 * @return Iterator<IShare>
 	 */
 	public function getSub(string $userId, int $filter, string $path): Iterator {
+		/** @var iterable<IShare> $shares */
 		$shares = $this->shareManager->getAllShares();
 
 		// If path is set. Filter for the current user
@@ -150,7 +143,7 @@ class SharesList {
 			return new EmptyIterator();
 		}
 
-		$shares = filter(function (IShare $share) use ($node) {
+		$shares = filter(function (IShare $share) use ($node): bool {
 			if ($node->getId() === $share->getNodeId()) {
 				return false;
 			}
@@ -161,21 +154,19 @@ class SharesList {
 		}, $shares);
 
 		if ($filter === self::FILTER_OWNER) {
-			$shares = filter(fn (IShare $share) => $share->getShareOwner() === $userId, $shares);
+			$shares = filter(fn (IShare $share): bool => $share->getShareOwner() === $userId, $shares);
 		}
 		if ($filter === self::FILTER_INITIATOR) {
-			$shares = filter(fn (IShare $share) => $share->getSharedBy() === $userId, $shares);
+			$shares = filter(fn (IShare $share): bool => $share->getSharedBy() === $userId, $shares);
 		}
 		if ($filter === self::FILTER_RECIPIENT) {
 			// We can't check the recipient since this might be a group share etc. However you can't share to yourself
-			$shares = filter(fn (IShare $share) => $share->getShareOwner() !== $userId && $share->getSharedBy() !== $userId, $shares);
+			$shares = filter(fn (IShare $share): bool => $share->getShareOwner() !== $userId && $share->getSharedBy() !== $userId, $shares);
 		}
 
-		$shares = filter(function (IShare $share) {
+		return filter(function (IShare $share): bool {
 			try {
 				$userFolder = $this->rootFolder->getUserFolder($share->getShareOwner());
-			} catch (NoUserException) {
-				return false;
 			} catch (Throwable) {
 				return false;
 			}
@@ -183,8 +174,6 @@ class SharesList {
 
 			return $nodes !== [];
 		}, $shares);
-
-		return $shares;
 	}
 
 	public function getFormattedShares(?string $userId = null, int $filter = self::FILTER_NONE, ?string $path = null, ?string $token = null): Iterator {
@@ -196,7 +185,8 @@ class SharesList {
 	}
 
 	private function getShares(?string $userId): Iterator {
-		if (empty($userId)) {
+		if ($userId === null) {
+			/** @var iterable<IShare> $shares */
 			$shares = $this->shareManager->getAllShares();
 		} else {
 			$shareTypes = $this->getShareTypes();
@@ -232,12 +222,12 @@ class SharesList {
 		];
 
 		$nodes = $userFolder->getById($share->getNodeId());
-		$node = array_shift($nodes);
-		$data['path'] = $userFolder->getRelativePath($node->getPath());
-		$data['name'] = $node->getName();
-		$data['is_directory'] = $node->getType() === 'dir';
-
-
+		if (!empty($nodes)) {
+			$node = array_shift($nodes);
+			$data['path'] = $userFolder->getRelativePath($node->getPath());
+			$data['name'] = $node->getName();
+			$data['is_directory'] = $node->getType() === 'dir';
+		}
 
 		if ($share->getShareType() === IShare::TYPE_USER) {
 			$data['type'] = 'user';
@@ -261,15 +251,16 @@ class SharesList {
 			$data['recipient'] = $share->getSharedWith();
 		}
 
-		if ($share->getExpirationDate() !== null) {
-			$data['expiration'] = $share->getExpirationDate()->format('Y-m-d H:i:s');
+		$expirationDate = $share->getExpirationDate();
+		if ($expirationDate !== null) {
+			$data['expiration'] = $expirationDate->format('Y-m-d H:i:s');
 		}
 
 		return $data;
 	}
 
 	public function filterStringToInt(?string $filterString): int {
-		$filter = match ($filterString) {
+		return match ($filterString) {
 			'owner' => SharesList::FILTER_OWNER,
 			'initiator' => SharesList::FILTER_INITIATOR,
 			'recipient' => SharesList::FILTER_RECIPIENT,
@@ -277,8 +268,6 @@ class SharesList {
 			'no-expiration' => SharesList::FILTER_NO_EXPIRATION,
 			default => SharesList::FILTER_NONE,
 		};
-
-		return $filter;
 	}
 
 	public function getSerializedShares(array $shares, ?string $format = 'json'): string {
