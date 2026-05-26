@@ -5,14 +5,14 @@
 	<name>Share Listing</name>
 	<summary>List shares on the command line</summary>
 	<description>The application generates a list of shares for display at the command line</description>
-	<version>1.3.0</version>
+	<version>1.4.0</version>
 	<licence>agpl</licence>
 	<author>Roeland Jago Douma</author>
 	<namespace>ShareListing</namespace>
 	<category>tools</category>
 	<bugs>https://github.com/nextcloud/sharelisting/issues</bugs>
 	<dependencies>
-		<nextcloud min-version="30" max-version="32" />
+		<nextcloud min-version="31" max-version="34" />
 	</dependencies>
 
 	<commands>
