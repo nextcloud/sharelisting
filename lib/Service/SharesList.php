@@ -75,13 +75,17 @@ final class SharesList {
 				return new EmptyIterator();
 			}
 			$shares = filter(function (IShare $share) use ($node) {
-				if ($node->getId() === $share->getNodeId()) {
-					return true;
+				try {
+					if ($node->getId() === $share->getNodeId()) {
+						return true;
+					}
+					if ($node instanceof Folder) {
+						return !empty($node->getById($share->getNodeId()));
+					}
+					return false;
+				} catch (NotFoundException) {
+					return false;
 				}
-				if ($node instanceof Folder) {
-					return !empty($node->getById($share->getNodeId()));
-				}
-				return false;
 			}, $shares);
 		}
 		if ($token !== null) {
@@ -144,13 +148,17 @@ final class SharesList {
 		}
 
 		$shares = filter(function (IShare $share) use ($node): bool {
-			if ($node->getId() === $share->getNodeId()) {
+			try {
+				if ($node->getId() === $share->getNodeId()) {
+					return false;
+				}
+				if ($node instanceof Folder) {
+					return !empty($node->getById($share->getNodeId()));
+				}
+				return false;
+			} catch (NotFoundException) {
 				return false;
 			}
-			if ($node instanceof Folder) {
-				return !empty($node->getById($share->getNodeId()));
-			}
-			return false;
 		}, $shares);
 
 		if ($filter === self::FILTER_OWNER) {
